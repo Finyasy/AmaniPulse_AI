@@ -1,0 +1,151 @@
+# AmaniPulse AI Backend
+
+This is the first FastAPI backend implementation for the AmaniPulse AI iPhone Citizen MVP.
+
+It gives the iPhone app concrete APIs for anonymous report submission, report status, incident taxonomy, county risk guidance, app configuration, and localized safety resources.
+
+## Current Scope
+
+Implemented now:
+
+- FastAPI application under `app/`.
+- Versioned `/v1` API routes.
+- Anonymous report submission contract.
+- Report status lookup.
+- English and Swahili incident taxonomy.
+- County risk guidance.
+- App configuration.
+- Localized safety resources.
+- Deterministic MVP AI pipeline placeholder.
+- In-memory repositories for local development.
+- PostgreSQL/PostGIS SQLAlchemy models.
+- Alembic migration for report and county risk tables.
+- Tests for the core API contracts.
+
+Prepared for next:
+
+- Redis/Celery async processing.
+- Encrypted report storage.
+- Human review queue.
+- Production deployment.
+
+## Run Locally
+
+From this directory:
+
+```bash
+uv sync --dev
+uv run uvicorn app.main:app --reload
+```
+
+Open:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+By default, the API uses in-memory storage so the app can run without local infrastructure.
+
+## Run With PostgreSQL/PostGIS
+
+Start local services:
+
+```bash
+docker compose up -d postgres redis
+```
+
+Run migrations:
+
+```bash
+STORAGE_BACKEND=postgres uv run alembic upgrade head
+```
+
+Start the API with PostgreSQL persistence:
+
+```bash
+STORAGE_BACKEND=postgres uv run uvicorn app.main:app --reload
+```
+
+Run the Celery worker in a second terminal when `CELERY_TASK_ALWAYS_EAGER=false`:
+
+```bash
+STORAGE_BACKEND=postgres CELERY_TASK_ALWAYS_EAGER=false uv run celery \
+  -A app.workers.celery_app.celery_app worker --loglevel=info
+```
+
+The default database URL is:
+
+```text
+postgresql+asyncpg://amanipulse:amanipulse@localhost:55432/amanipulse
+```
+
+The compose file maps container Postgres `5432` to host `55432` to avoid colliding with
+local Postgres installations.
+
+Generate a real report encryption key before pilot or production use:
+
+```bash
+uv run python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"
+```
+
+Then set:
+
+```bash
+REPORT_ENCRYPTION_KEY=<generated-key>
+```
+
+## Test
+
+```bash
+uv run pytest
+uv run ruff check .
+```
+
+## API Endpoints
+
+```text
+GET  /v1/health
+GET  /v1/incident-taxonomy?language=en
+POST /v1/reports
+GET  /v1/reports/{report_reference}/status
+GET  /v1/risk/county/{county_code}
+GET  /v1/app-config?platform=ios&version=1.0.0&language=en
+GET  /v1/resources?language=sw&country=KE
+```
+
+## Architecture
+
+The iPhone app should remain a safe reporting client. It should not own peace intelligence or AI decisions.
+
+Backend responsibilities:
+
+- Receive anonymous reports.
+- Validate and minimize data.
+- Encrypt sensitive report descriptions before storing them.
+- Run classification and escalation logic.
+- Update aggregated county risk guidance.
+- Keep high-risk reports available for future human review.
+- Serve calm, public, non-sensitive guidance back to the iPhone app.
+
+## Worker Mode
+
+For tests and simple local development, `CELERY_TASK_ALWAYS_EAGER=true` runs report processing
+inside the API process. For a production-like local run, set `CELERY_TASK_ALWAYS_EAGER=false`
+and start the Celery worker separately.
+
+## Important Safety Notes
+
+- No user accounts are required.
+- No phone number, email, national ID, or name is collected.
+- Report text must not be sent to analytics.
+- Push notifications must not include report content.
+- Exact location is not required.
+- In-memory storage is for development only.
+
+## Next Implementation Milestones
+
+1. Add encrypted report content storage.
+2. Add human review API for trusted internal operators.
+3. Expand PostGIS county aggregation beyond seeded MVP counties.
+4. Add Postgres-backed integration tests behind an opt-in environment flag.
+5. Add deployment config for Render, Fly, AWS, or another selected host.

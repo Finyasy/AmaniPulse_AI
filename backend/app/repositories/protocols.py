@@ -1,0 +1,36 @@
+from typing import Protocol
+
+from app.domain.enums import ReportStatus
+from app.domain.records import ReportRecord
+from app.domain.schemas import CountyRiskResponse
+
+
+class ReportStore(Protocol):
+    async def create(self, record: ReportRecord) -> ReportRecord:
+        pass
+
+    async def get(self, report_reference: str) -> ReportRecord | None:
+        pass
+
+    async def update_status(
+        self,
+        report_reference: str,
+        status: ReportStatus,
+        ai_labels: dict[str, str | int | float | bool] | None = None,
+    ) -> ReportRecord | None:
+        pass
+
+
+class RiskStore(Protocol):
+    async def get(self, county_code: str) -> CountyRiskResponse | None:
+        pass
+
+    async def county_code_for_name(self, county_name: str | None) -> str | None:
+        pass
+
+    async def bump_for_report(
+        self,
+        county_name: str | None,
+        severity_score: int,
+    ) -> CountyRiskResponse | None:
+        pass
