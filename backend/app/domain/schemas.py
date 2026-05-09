@@ -93,6 +93,44 @@ class ReportStatusResponse(BaseModel):
     display_message: str
 
 
+class ReviewReportSummary(BaseModel):
+    report_reference: str
+    category: IncidentCategory
+    status: ReportStatus
+    incident_time: datetime
+    received_at: datetime
+    updated_at: datetime
+    county: str | None
+    area_label: str | None
+    language: str
+    severity_score: int | None = None
+    urgency: str | None = None
+    needs_human_review: bool | None = None
+
+
+class ReviewReportDetail(ReviewReportSummary):
+    description: str
+    ai_labels: dict[str, str | int | float | bool]
+
+
+class ReviewQueueResponse(BaseModel):
+    reports: list[ReviewReportSummary]
+
+
+class ReviewDecisionRequest(BaseModel):
+    status: Literal["aggregated", "closed", "unable_to_process"]
+    reviewer_id: str = Field(..., min_length=2, max_length=80)
+    note: str = Field(..., min_length=3, max_length=500)
+
+
+class ReviewDecisionResponse(BaseModel):
+    report_reference: str
+    status: ReportStatus
+    updated_at: datetime
+    reviewer_id: str
+    note: str
+
+
 class IncidentTaxonomyItem(BaseModel):
     id: IncidentCategory
     name: str

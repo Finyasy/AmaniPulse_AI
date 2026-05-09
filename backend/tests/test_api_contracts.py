@@ -54,3 +54,61 @@ def test_taxonomy_supports_swahili() -> None:
     assert response.status_code == 200
     assert response.json()["language"] == "sw"
     assert len(response.json()["categories"]) > 0
+
+
+def test_internal_review_flow_requires_token_and_applies_decision() -> None:
+    payload = {
+        "client_report_id": "local-review-001",
+        "category": "violence_threat",
+        "description": "A group is warning people about an attack near a rally.",
+        "incident_time": (datetime.now(UTC) - timedelta(minutes=5)).isoformat(),
+        "location": {
+            "mode": "manual_area",
+            "country": "KE",
+            "county": "Nairobi",
+            "area_label": "Kasarani",
+        },
+        "language": "en",
+        "source": "ios_citizen_app",
+        "app_version": "1.0.0",
+        "consents": {
+            "anonymous_submission": True,
+            "risk_analysis": True,
+        },
+    }
+
+    create_response = client.post("/v1/reports", json=payload)
+    assert create_response.status_code == 201
+    report_reference = create_response.json()["report_reference"]
+
+    unauthorized = client.get("/v1/internal/review/queue")
+    assert unauthorized.status_code == 401
+
+    headers = {"X-Internal-Token": "dev-internal-review-token"}
+    queue_response = client.get("/v1/internal/review/queue", headers=headers)
+    assert queue_response.status_code == 200
+    references = [item["report_reference"] for item in queue_response.json()["reports"]]
+    assert report_reference in references
+
+    detail_response = client.get(
+        f"/v1/internal/review/reports/{report_reference}",
+        headers=headers,
+    )
+    assert detail_response.status_code == 200
+    assert "attack near a rally" in detail_response.json()["description"]
+
+    decision_response = client.post(
+        f"/v1/internal/review/reports/{report_reference}/decision",
+        headers=headers,
+        json={
+            "status": "aggregated",
+            "reviewer_id": "reviewer-1",
+            "note": "Included in aggregate monitoring.",
+        },
+    )
+    assert decision_response.status_code == 200
+    assert decision_response.json()["status"] == "aggregated"
+
+    status_response = client.get(f"/v1/reports/{report_reference}/status")
+    assert status_response.status_code == 200
+    assert status_response.json()["status"] == "aggregated"

@@ -79,6 +79,19 @@ class SqlReportStore:
         await self._session.refresh(model)
         return self._to_record(model)
 
+    async def list_by_status(
+        self,
+        status: ReportStatus,
+        limit: int = 50,
+    ) -> list[ReportRecord]:
+        result = await self._session.scalars(
+            select(ReportModel)
+            .where(ReportModel.status == status.value)
+            .order_by(ReportModel.updated_at.desc())
+            .limit(limit)
+        )
+        return [self._to_record(model) for model in result.all()]
+
     def _to_record(self, model: ReportModel) -> ReportRecord:
         return ReportRecord(
             report_reference=model.report_reference,

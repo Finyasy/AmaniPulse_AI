@@ -111,6 +111,9 @@ GET  /v1/reports/{report_reference}/status
 GET  /v1/risk/county/{county_code}
 GET  /v1/app-config?platform=ios&version=1.0.0&language=en
 GET  /v1/resources?language=sw&country=KE
+GET  /v1/internal/review/queue
+GET  /v1/internal/review/reports/{report_reference}
+POST /v1/internal/review/reports/{report_reference}/decision
 ```
 
 ## Architecture
@@ -133,6 +136,22 @@ For tests and simple local development, `CELERY_TASK_ALWAYS_EAGER=true` runs rep
 inside the API process. For a production-like local run, set `CELERY_TASK_ALWAYS_EAGER=false`
 and start the Celery worker separately.
 
+## Internal Review
+
+Internal review endpoints require:
+
+```text
+X-Internal-Token: <INTERNAL_API_TOKEN>
+```
+
+Use them to inspect reports marked `under_review` and apply safe review decisions:
+
+- `aggregated`
+- `closed`
+- `unable_to_process`
+
+These endpoints are intentionally not part of the citizen iPhone API surface.
+
 ## Important Safety Notes
 
 - No user accounts are required.
@@ -144,8 +163,8 @@ and start the Celery worker separately.
 
 ## Next Implementation Milestones
 
-1. Add encrypted report content storage.
-2. Add human review API for trusted internal operators.
-3. Expand PostGIS county aggregation beyond seeded MVP counties.
-4. Add Postgres-backed integration tests behind an opt-in environment flag.
+1. Expand PostGIS county aggregation beyond seeded MVP counties.
+2. Add Postgres-backed integration tests behind an opt-in environment flag.
+3. Add stronger internal authentication for reviewers.
+4. Add review audit tables instead of storing review notes in AI labels.
 5. Add deployment config for Render, Fly, AWS, or another selected host.

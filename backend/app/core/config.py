@@ -21,6 +21,7 @@ class Settings(BaseModel):
         "REPORT_ENCRYPTION_KEY",
         "YW1hbmlwdWxzZS1kZXYtcmVwb3J0LWtleS0zMmIhISE=",
     )
+    internal_api_token: str = getenv("INTERNAL_API_TOKEN", "dev-internal-review-token")
 
 
 @lru_cache

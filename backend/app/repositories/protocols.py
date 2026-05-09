@@ -20,6 +20,13 @@ class ReportStore(Protocol):
     ) -> ReportRecord | None:
         pass
 
+    async def list_by_status(
+        self,
+        status: ReportStatus,
+        limit: int = 50,
+    ) -> list[ReportRecord]:
+        pass
+
 
 class RiskStore(Protocol):
     async def get(self, county_code: str) -> CountyRiskResponse | None:

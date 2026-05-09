@@ -45,6 +45,15 @@ class InMemoryReportStore:
                 record.ai_labels.update(ai_labels)
             return record
 
+    async def list_by_status(
+        self,
+        status: ReportStatus,
+        limit: int = 50,
+    ) -> list[ReportRecord]:
+        with self._lock:
+            matching = [record for record in self._reports.values() if record.status == status]
+            return sorted(matching, key=lambda record: record.updated_at, reverse=True)[:limit]
+
 
 class InMemoryRiskStore:
     def __init__(self) -> None:
