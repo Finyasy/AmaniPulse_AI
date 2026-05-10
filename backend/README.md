@@ -102,6 +102,12 @@ uv run pytest
 uv run ruff check .
 ```
 
+Run Postgres-backed integration tests when Docker services are up:
+
+```bash
+RUN_POSTGRES_TESTS=1 STORAGE_BACKEND=postgres uv run pytest tests/integration
+```
+
 ## API Endpoints
 
 ```text
@@ -128,6 +134,7 @@ Backend responsibilities:
 - Validate and minimize data.
 - Encrypt sensitive report descriptions before storing them.
 - Run classification and escalation logic.
+- Add non-sensitive PII/safety flags for human reviewers.
 - Update aggregated county risk guidance.
 - Keep high-risk reports available for future human review.
 - Serve calm, public, non-sensitive guidance back to the iPhone app.
@@ -177,7 +184,5 @@ KE-047 Nairobi
 ## Next Implementation Milestones
 
 1. Add PostGIS county centroids or boundaries for spatial aggregation.
-2. Add Postgres-backed integration tests behind an opt-in environment flag.
-3. Add stronger internal authentication for reviewers.
-4. Add PII detection/redaction hints for report descriptions.
-5. Add deployment config for Render, Fly, AWS, or another selected host.
+2. Add stronger internal authentication for reviewers.
+3. Add deployment config for Render, Fly, AWS, or another selected host.

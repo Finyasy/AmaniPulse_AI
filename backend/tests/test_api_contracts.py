@@ -130,3 +130,41 @@ def test_internal_review_flow_requires_token_and_applies_decision() -> None:
     status_response = client.get(f"/v1/reports/{report_reference}/status")
     assert status_response.status_code == 200
     assert status_response.json()["status"] == "aggregated"
+
+
+def test_pii_hints_move_report_to_review_without_exposing_values() -> None:
+    payload = {
+        "client_report_id": "local-pii-001",
+        "category": "misinformation_or_rumor",
+        "description": "A rumor includes person@example.com and +254712345678.",
+        "incident_time": (datetime.now(UTC) - timedelta(minutes=5)).isoformat(),
+        "location": {
+            "mode": "manual_area",
+            "country": "KE",
+            "county": "Nairobi",
+            "area_label": "Kasarani",
+        },
+        "language": "en",
+        "source": "ios_citizen_app",
+        "app_version": "1.0.0",
+        "consents": {
+            "anonymous_submission": True,
+            "risk_analysis": True,
+        },
+    }
+
+    create_response = client.post("/v1/reports", json=payload)
+    assert create_response.status_code == 201
+    report_reference = create_response.json()["report_reference"]
+
+    headers = {"X-Internal-Token": "dev-internal-review-token"}
+    detail_response = client.get(
+        f"/v1/internal/review/reports/{report_reference}",
+        headers=headers,
+    )
+    assert detail_response.status_code == 200
+    labels = detail_response.json()["ai_labels"]
+    assert labels["pii_detected"] is True
+    assert labels["safety_flags"] == "email,phone_number"
+    assert "person@example.com" not in labels["safety_flags"]
+    assert "+254712345678" not in labels["safety_flags"]
