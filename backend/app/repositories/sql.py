@@ -5,9 +5,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
 from app.core.crypto import ReportCrypto
-from app.db.models import CountyRiskModel, ReportModel
+from app.db.models import CountyRiskModel, ReportModel, ReviewEventModel
 from app.domain.enums import IncidentCategory, LocationMode, ReportStatus, RiskLevel
 from app.domain.records import ReportRecord
+from app.domain.review import ReviewEventRecord
 from app.domain.schemas import CountyRiskResponse, LocationPayload
 
 
@@ -92,6 +93,33 @@ class SqlReportStore:
         )
         return [self._to_record(model) for model in result.all()]
 
+    async def add_review_event(self, event: ReviewEventRecord) -> ReviewEventRecord:
+        model = ReviewEventModel(
+            report_reference=event.report_reference,
+            reviewer_id=event.reviewer_id,
+            previous_status=event.previous_status.value,
+            new_status=event.new_status.value,
+            note=event.note,
+            created_at=event.created_at,
+        )
+        self._session.add(model)
+        await self._session.flush()
+        await self._session.refresh(model)
+        return self._to_review_event(model)
+
+    async def list_review_events(
+        self,
+        report_reference: str,
+        limit: int = 50,
+    ) -> list[ReviewEventRecord]:
+        result = await self._session.scalars(
+            select(ReviewEventModel)
+            .where(ReviewEventModel.report_reference == report_reference)
+            .order_by(ReviewEventModel.created_at.desc())
+            .limit(limit)
+        )
+        return [self._to_review_event(model) for model in result.all()]
+
     def _to_record(self, model: ReportModel) -> ReportRecord:
         return ReportRecord(
             report_reference=model.report_reference,
@@ -115,6 +143,16 @@ class SqlReportStore:
             received_at=model.received_at,
             updated_at=model.updated_at,
             ai_labels=model.ai_labels or {},
+        )
+
+    def _to_review_event(self, model: ReviewEventModel) -> ReviewEventRecord:
+        return ReviewEventRecord(
+            report_reference=model.report_reference,
+            reviewer_id=model.reviewer_id,
+            previous_status=ReportStatus(model.previous_status),
+            new_status=ReportStatus(model.new_status),
+            note=model.note,
+            created_at=model.created_at,
         )
 
 

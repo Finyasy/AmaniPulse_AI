@@ -2,6 +2,7 @@ from typing import Protocol
 
 from app.domain.enums import ReportStatus
 from app.domain.records import ReportRecord
+from app.domain.review import ReviewEventRecord
 from app.domain.schemas import CountyRiskResponse
 
 
@@ -25,6 +26,16 @@ class ReportStore(Protocol):
         status: ReportStatus,
         limit: int = 50,
     ) -> list[ReportRecord]:
+        pass
+
+    async def add_review_event(self, event: ReviewEventRecord) -> ReviewEventRecord:
+        pass
+
+    async def list_review_events(
+        self,
+        report_reference: str,
+        limit: int = 50,
+    ) -> list[ReviewEventRecord]:
         pass
 
 

@@ -114,6 +114,7 @@ GET  /v1/resources?language=sw&country=KE
 GET  /v1/internal/review/queue
 GET  /v1/internal/review/reports/{report_reference}
 POST /v1/internal/review/reports/{report_reference}/decision
+GET  /v1/internal/review/reports/{report_reference}/events
 ```
 
 ## Architecture
@@ -151,6 +152,7 @@ Use them to inspect reports marked `under_review` and apply safe review decision
 - `unable_to_process`
 
 These endpoints are intentionally not part of the citizen iPhone API surface.
+Review decisions are stored in a dedicated `review_events` audit table.
 
 ## Important Safety Notes
 
@@ -166,5 +168,5 @@ These endpoints are intentionally not part of the citizen iPhone API surface.
 1. Expand PostGIS county aggregation beyond seeded MVP counties.
 2. Add Postgres-backed integration tests behind an opt-in environment flag.
 3. Add stronger internal authentication for reviewers.
-4. Add review audit tables instead of storing review notes in AI labels.
+4. Add PII detection/redaction hints for report descriptions.
 5. Add deployment config for Render, Fly, AWS, or another selected host.

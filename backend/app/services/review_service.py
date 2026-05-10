@@ -2,8 +2,10 @@ from datetime import UTC, datetime
 
 from app.domain.enums import ReportStatus
 from app.domain.records import ReportRecord
+from app.domain.review import ReviewEventRecord
 from app.domain.schemas import (
     ReviewDecisionResponse,
+    ReviewEventItem,
     ReviewReportDetail,
     ReviewReportSummary,
 )
@@ -42,17 +44,28 @@ class ReviewService:
         store: ReportStore,
     ) -> ReviewDecisionResponse | None:
         reviewed_at = datetime.now(UTC)
+        current = await store.get(report_reference)
+        if current is None:
+            return None
+        previous_status = current.status
+
         updated = await store.update_status(
             report_reference,
             status=status,
-            ai_labels={
-                "reviewer_id": reviewer_id,
-                "review_note": note,
-                "reviewed_at": reviewed_at.isoformat(),
-            },
+            ai_labels={"last_reviewed_at": reviewed_at.isoformat()},
         )
         if updated is None:
             return None
+        await store.add_review_event(
+            ReviewEventRecord(
+                report_reference=report_reference,
+                reviewer_id=reviewer_id,
+                previous_status=previous_status,
+                new_status=status,
+                note=note,
+                created_at=reviewed_at,
+            )
+        )
         return ReviewDecisionResponse(
             report_reference=updated.report_reference,
             status=updated.status,
@@ -60,6 +73,27 @@ class ReviewService:
             reviewer_id=reviewer_id,
             note=note,
         )
+
+    async def list_review_events(
+        self,
+        report_reference: str,
+        store: ReportStore,
+        limit: int,
+    ) -> list[ReviewEventItem] | None:
+        if await store.get(report_reference) is None:
+            return None
+        events = await store.list_review_events(report_reference, limit=limit)
+        return [
+            ReviewEventItem(
+                report_reference=event.report_reference,
+                reviewer_id=event.reviewer_id,
+                previous_status=event.previous_status,
+                new_status=event.new_status,
+                note=event.note,
+                created_at=event.created_at,
+            )
+            for event in events
+        ]
 
     def _to_summary(self, report: ReportRecord) -> ReviewReportSummary:
         return ReviewReportSummary(

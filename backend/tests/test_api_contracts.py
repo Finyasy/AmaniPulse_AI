@@ -109,6 +109,17 @@ def test_internal_review_flow_requires_token_and_applies_decision() -> None:
     assert decision_response.status_code == 200
     assert decision_response.json()["status"] == "aggregated"
 
+    events_response = client.get(
+        f"/v1/internal/review/reports/{report_reference}/events",
+        headers=headers,
+    )
+    assert events_response.status_code == 200
+    events = events_response.json()["events"]
+    assert len(events) == 1
+    assert events[0]["previous_status"] == "under_review"
+    assert events[0]["new_status"] == "aggregated"
+    assert events[0]["reviewer_id"] == "reviewer-1"
+
     status_response = client.get(f"/v1/reports/{report_reference}/status")
     assert status_response.status_code == 200
     assert status_response.json()["status"] == "aggregated"

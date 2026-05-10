@@ -8,6 +8,7 @@ from app.domain.enums import ReportStatus
 from app.domain.schemas import (
     ReviewDecisionRequest,
     ReviewDecisionResponse,
+    ReviewEventsResponse,
     ReviewQueueResponse,
     ReviewReportDetail,
 )
@@ -85,3 +86,26 @@ async def apply_review_decision(
             },
         )
     return decision
+
+
+@router.get("/reports/{report_reference}/events", response_model=ReviewEventsResponse)
+async def list_review_events(
+    report_reference: str,
+    _auth: InternalAuthDep,
+    store: ReportStoreDep,
+    limit: int = Query(default=50, ge=1, le=100),
+) -> ReviewEventsResponse:
+    events = await review_service.list_review_events(
+        report_reference=report_reference,
+        store=store,
+        limit=limit,
+    )
+    if events is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={
+                "code": "report_not_found",
+                "message": "No report was found for that reference.",
+            },
+        )
+    return ReviewEventsResponse(events=events)

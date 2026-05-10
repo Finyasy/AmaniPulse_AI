@@ -3,6 +3,7 @@ from threading import Lock
 
 from app.domain.enums import ReportStatus, RiskLevel
 from app.domain.records import ReportRecord
+from app.domain.review import ReviewEventRecord
 from app.domain.schemas import CountyRiskResponse
 
 
@@ -10,6 +11,7 @@ class InMemoryReportStore:
     def __init__(self) -> None:
         self._reports: dict[str, ReportRecord] = {}
         self._client_ids: set[str] = set()
+        self._review_events: list[ReviewEventRecord] = []
         self._lock = Lock()
 
     async def create(self, record: ReportRecord) -> ReportRecord:
@@ -53,6 +55,24 @@ class InMemoryReportStore:
         with self._lock:
             matching = [record for record in self._reports.values() if record.status == status]
             return sorted(matching, key=lambda record: record.updated_at, reverse=True)[:limit]
+
+    async def add_review_event(self, event: ReviewEventRecord) -> ReviewEventRecord:
+        with self._lock:
+            self._review_events.append(event)
+            return event
+
+    async def list_review_events(
+        self,
+        report_reference: str,
+        limit: int = 50,
+    ) -> list[ReviewEventRecord]:
+        with self._lock:
+            matching = [
+                event
+                for event in self._review_events
+                if event.report_reference == report_reference
+            ]
+            return sorted(matching, key=lambda event: event.created_at, reverse=True)[:limit]
 
 
 class InMemoryRiskStore:

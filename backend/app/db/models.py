@@ -40,6 +40,22 @@ class ReportModel(Base):
     )
 
 
+class ReviewEventModel(Base):
+    __tablename__ = "review_events"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    report_reference: Mapped[str] = mapped_column(String(32), index=True)
+    reviewer_id: Mapped[str] = mapped_column(String(80), index=True)
+    previous_status: Mapped[str] = mapped_column(String(40), index=True)
+    new_status: Mapped[str] = mapped_column(String(40), index=True)
+    note: Mapped[str] = mapped_column(Text)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(UTC),
+        index=True,
+    )
+
+
 class CountyRiskModel(Base):
     __tablename__ = "county_risk"
 

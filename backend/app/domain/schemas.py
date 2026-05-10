@@ -131,6 +131,19 @@ class ReviewDecisionResponse(BaseModel):
     note: str
 
 
+class ReviewEventItem(BaseModel):
+    report_reference: str
+    reviewer_id: str
+    previous_status: ReportStatus
+    new_status: ReportStatus
+    note: str
+    created_at: datetime
+
+
+class ReviewEventsResponse(BaseModel):
+    events: list[ReviewEventItem]
+
+
 class IncidentTaxonomyItem(BaseModel):
     id: IncidentCategory
     name: str
