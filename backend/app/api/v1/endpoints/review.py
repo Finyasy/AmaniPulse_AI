@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 
 from app.api.deps import get_report_store
-from app.core.config import get_settings
+from app.domain.auth import InternalReviewerIdentity
 from app.domain.enums import ReportStatus
 from app.domain.schemas import (
     ReviewDecisionRequest,
@@ -13,6 +13,7 @@ from app.domain.schemas import (
     ReviewReportDetail,
 )
 from app.repositories.protocols import ReportStore
+from app.services.internal_auth_service import internal_auth_service
 from app.services.review_service import review_service
 
 router = APIRouter(prefix="/internal/review")
@@ -21,8 +22,9 @@ ReportStoreDep = Annotated[ReportStore, Depends(get_report_store)]
 
 async def require_internal_token(
     x_internal_token: Annotated[str | None, Header()] = None,
-) -> None:
-    if x_internal_token != get_settings().internal_api_token:
+) -> InternalReviewerIdentity:
+    identity = await internal_auth_service.authenticate(x_internal_token)
+    if identity is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail={
@@ -30,9 +32,10 @@ async def require_internal_token(
                 "message": "A valid internal token is required.",
             },
         )
+    return identity
 
 
-InternalAuthDep = Annotated[None, Depends(require_internal_token)]
+InternalAuthDep = Annotated[InternalReviewerIdentity, Depends(require_internal_token)]
 
 
 @router.get("/queue", response_model=ReviewQueueResponse)
@@ -67,13 +70,13 @@ async def get_review_report(
 async def apply_review_decision(
     report_reference: str,
     payload: ReviewDecisionRequest,
-    _auth: InternalAuthDep,
+    identity: InternalAuthDep,
     store: ReportStoreDep,
 ) -> ReviewDecisionResponse:
     decision = await review_service.apply_decision(
         report_reference=report_reference,
         status=ReportStatus(payload.status),
-        reviewer_id=payload.reviewer_id,
+        reviewer_id=identity.reviewer_id,
         note=payload.note,
         store=store,
     )

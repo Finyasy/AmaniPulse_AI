@@ -21,6 +21,7 @@ Implemented now:
 - PostgreSQL/PostGIS SQLAlchemy models.
 - Alembic migration for report and county risk tables.
 - Baseline risk guidance seeded for all 47 Kenya counties.
+- Hashed internal review API keys with reviewer identity derived from the token.
 - Tests for the core API contracts.
 
 Prepared for next:
@@ -153,6 +154,10 @@ Internal review endpoints require:
 X-Internal-Token: <INTERNAL_API_TOKEN>
 ```
 
+In PostgreSQL mode, internal tokens are stored as SHA-256 hashes in the
+`internal_api_keys` table. The request body cannot choose the reviewer identity;
+review events use the reviewer attached to the authenticated key.
+
 Use them to inspect reports marked `under_review` and apply safe review decisions:
 
 - `aggregated`
@@ -184,5 +189,6 @@ KE-047 Nairobi
 ## Next Implementation Milestones
 
 1. Add PostGIS county centroids or boundaries for spatial aggregation.
-2. Add stronger internal authentication for reviewers.
+2. Add role-scoped reviewer permissions beyond the default reviewer role.
 3. Add deployment config for Render, Fly, AWS, or another selected host.
+4. Add observability with safe structured logs and no raw report text.

@@ -119,7 +119,7 @@ class ReviewQueueResponse(BaseModel):
 
 class ReviewDecisionRequest(BaseModel):
     status: Literal["aggregated", "closed", "unable_to_process"]
-    reviewer_id: str = Field(..., min_length=2, max_length=80)
+    reviewer_id: str | None = Field(default=None, min_length=2, max_length=80)
     note: str = Field(..., min_length=3, max_length=500)
 
 

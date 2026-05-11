@@ -47,7 +47,7 @@ def test_postgres_migrations_and_county_seed() -> None:
 
         await engine.dispose()
         assert county_count == 47
-        assert revision == "20260510_0004"
+        assert revision == "20260511_0005"
         assert row.county_name == "Nairobi"
         assert row.risk_level in {"low", "moderate", "high", "critical"}
         assert 0 <= row.score <= 100

@@ -91,6 +91,12 @@ def test_internal_review_flow_requires_token_and_applies_decision() -> None:
     unauthorized = client.get("/v1/internal/review/queue")
     assert unauthorized.status_code == 401
 
+    invalid = client.get(
+        "/v1/internal/review/queue",
+        headers={"X-Internal-Token": "not-the-review-token"},
+    )
+    assert invalid.status_code == 401
+
     headers = {"X-Internal-Token": "dev-internal-review-token"}
     queue_response = client.get("/v1/internal/review/queue", headers=headers)
     assert queue_response.status_code == 200
@@ -109,12 +115,13 @@ def test_internal_review_flow_requires_token_and_applies_decision() -> None:
         headers=headers,
         json={
             "status": "aggregated",
-            "reviewer_id": "reviewer-1",
+            "reviewer_id": "spoofed-reviewer",
             "note": "Included in aggregate monitoring.",
         },
     )
     assert decision_response.status_code == 200
     assert decision_response.json()["status"] == "aggregated"
+    assert decision_response.json()["reviewer_id"] == "dev-reviewer"
 
     events_response = client.get(
         f"/v1/internal/review/reports/{report_reference}/events",
@@ -125,7 +132,7 @@ def test_internal_review_flow_requires_token_and_applies_decision() -> None:
     assert len(events) == 1
     assert events[0]["previous_status"] == "under_review"
     assert events[0]["new_status"] == "aggregated"
-    assert events[0]["reviewer_id"] == "reviewer-1"
+    assert events[0]["reviewer_id"] == "dev-reviewer"
 
     status_response = client.get(f"/v1/reports/{report_reference}/status")
     assert status_response.status_code == 200
