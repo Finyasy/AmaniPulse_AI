@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { Bell, ListFilter, Map, Radar } from "lucide-react";
+import { Bell, ClipboardCheck, ListFilter, Map, Radar } from "lucide-react";
 
 const dashboardNav = [
   { href: "/dashboard", label: "Overview", icon: Radar },
   { href: "/dashboard/map", label: "Risk Map", icon: Map },
   { href: "/dashboard/incidents", label: "Incidents", icon: ListFilter },
+  { href: "/dashboard/review", label: "Review", icon: ClipboardCheck },
   { href: "/dashboard/alerts", label: "Alerts", icon: Bell },
 ];
 

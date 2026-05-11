@@ -324,6 +324,7 @@ export const siteMap = [
   { href: "/dashboard", label: "Dashboard", description: "Partner intelligence overview." },
   { href: "/dashboard/map", label: "Risk Map", description: "County risk heatmap." },
   { href: "/dashboard/incidents", label: "Incidents", description: "Anonymized incident stream." },
+  { href: "/dashboard/review", label: "Review", description: "Read-only human review queue and audit trail." },
   { href: "/dashboard/alerts", label: "Alerts", description: "AI alerts and recommended interventions." },
 ];
 

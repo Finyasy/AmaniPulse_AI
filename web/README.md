@@ -15,6 +15,7 @@ The existing product docs define the Citizen MVP as an iPhone-first reporting ap
 - `/dashboard` - Partner intelligence overview with national risk posture, county signals, and operational priorities.
 - `/dashboard/map` - Kenya risk heatmap view with county-level synthetic scores.
 - `/dashboard/incidents` - Anonymized incident stream for triage and pattern review.
+- `/dashboard/review` - Read-only partner review queue aligned with the backend review/audit contracts.
 - `/dashboard/alerts` - AI-generated escalation alerts and recommended peace interventions.
 
 ## Product Boundary
@@ -34,6 +35,8 @@ Those are future platform capabilities, not the first web demo.
 - Framework: Next.js App Router with TypeScript.
 - Styling: Plain CSS in `src/app/globals.css` to keep the prototype easy to inspect.
 - Data: Mock election-risk data in `src/lib/data.ts`, ready to be swapped for FastAPI endpoints later.
+- API contracts: Backend-compatible TypeScript payloads and response types in `src/lib/contracts.ts`.
+- API facade: `src/lib/api.ts` uses mock data by default and can call FastAPI when `NEXT_PUBLIC_AMANIPULSE_API_BASE_URL` is configured.
 - UI posture: Low-bandwidth, accessible, calm, and operational rather than a glossy marketing page.
 
 ## Demo Story
