@@ -20,6 +20,7 @@ Implemented now:
 - In-memory repositories for local development.
 - PostgreSQL/PostGIS SQLAlchemy models.
 - Alembic migration for report and county risk tables.
+- Baseline risk guidance seeded for all 47 Kenya counties.
 - Tests for the core API contracts.
 
 Prepared for next:
@@ -154,6 +155,16 @@ Use them to inspect reports marked `under_review` and apply safe review decision
 These endpoints are intentionally not part of the citizen iPhone API surface.
 Review decisions are stored in a dedicated `review_events` audit table.
 
+## County Codes
+
+County risk guidance uses Kenya county-code style identifiers:
+
+```text
+KE-001 Mombasa
+KE-042 Kisumu
+KE-047 Nairobi
+```
+
 ## Important Safety Notes
 
 - No user accounts are required.
@@ -165,7 +176,7 @@ Review decisions are stored in a dedicated `review_events` audit table.
 
 ## Next Implementation Milestones
 
-1. Expand PostGIS county aggregation beyond seeded MVP counties.
+1. Add PostGIS county centroids or boundaries for spatial aggregation.
 2. Add Postgres-backed integration tests behind an opt-in environment flag.
 3. Add stronger internal authentication for reviewers.
 4. Add PII detection/redaction hints for report descriptions.

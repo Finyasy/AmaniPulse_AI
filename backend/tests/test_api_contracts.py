@@ -2,6 +2,7 @@ from datetime import UTC, datetime, timedelta
 
 from fastapi.testclient import TestClient
 
+from app.domain.counties import KENYA_COUNTY_RISK_SEEDS
 from app.main import app
 
 client = TestClient(app)
@@ -44,9 +45,15 @@ def test_submit_report_and_fetch_status() -> None:
 
 
 def test_risk_guidance() -> None:
-    response = client.get("/v1/risk/county/KE-30")
+    assert len(KENYA_COUNTY_RISK_SEEDS) == 47
+
+    response = client.get("/v1/risk/county/KE-047")
     assert response.status_code == 200
     assert response.json()["county_name"] == "Nairobi"
+
+    response = client.get("/v1/risk/county/KE-001")
+    assert response.status_code == 200
+    assert response.json()["county_name"] == "Mombasa"
 
 
 def test_taxonomy_supports_swahili() -> None:

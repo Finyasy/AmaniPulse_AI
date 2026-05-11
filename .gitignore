@@ -9,3 +9,9 @@ __pycache__/
 .build/
 DerivedData/
 ios/build/
+node_modules/
+.next/
+.npm-cache/
+.playwright-mcp/
+test-results/
+playwright-report/

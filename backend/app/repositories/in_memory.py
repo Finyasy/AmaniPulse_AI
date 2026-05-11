@@ -1,6 +1,7 @@
 from datetime import UTC, datetime
 from threading import Lock
 
+from app.domain.counties import KENYA_COUNTY_RISK_SEEDS
 from app.domain.enums import ReportStatus, RiskLevel
 from app.domain.records import ReportRecord
 from app.domain.review import ReviewEventRecord
@@ -79,38 +80,19 @@ class InMemoryRiskStore:
     def __init__(self) -> None:
         now = datetime.now(UTC)
         self._risk: dict[str, CountyRiskResponse] = {
-            "KE-30": CountyRiskResponse(
-                county_code="KE-30",
-                county_name="Nairobi",
-                risk_level=RiskLevel.moderate,
-                score=54,
+            seed.county_code: CountyRiskResponse(
+                county_code=seed.county_code,
+                county_name=seed.county_name,
+                risk_level=seed.risk_level,
+                score=seed.score,
                 updated_at=now,
-                summary=(
-                    "Community reports and public signals suggest elevated tension "
-                    "in some areas."
-                ),
-                guidance=[
-                    "Avoid sharing unverified claims.",
-                    "Move away from crowds if tensions rise.",
-                    "Use anonymous reporting if you witness intimidation.",
-                ],
-            ),
-            "KE-42": CountyRiskResponse(
-                county_code="KE-42",
-                county_name="Kisumu",
-                risk_level=RiskLevel.low,
-                score=28,
-                updated_at=now,
-                summary="No unusual risk signals are currently visible in aggregated guidance.",
-                guidance=[
-                    "Continue verifying information before sharing.",
-                    "Report intimidation or threats anonymously if you witness them.",
-                ],
-            ),
+                summary=seed.summary,
+                guidance=seed.guidance,
+            )
+            for seed in KENYA_COUNTY_RISK_SEEDS
         }
         self._county_name_to_code = {
-            "nairobi": "KE-30",
-            "kisumu": "KE-42",
+            seed.county_name.lower(): seed.county_code for seed in KENYA_COUNTY_RISK_SEEDS
         }
         self._lock = Lock()
 
