@@ -1,0 +1,577 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AA0000000000000000000101 /* AmaniPulseCitizenApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000001 /* AmaniPulseCitizenApp.swift */; };
+		AA0000000000000000000102 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000002 /* AppLanguage.swift */; };
+		AA0000000000000000000103 /* IncidentCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000003 /* IncidentCategory.swift */; };
+		AA0000000000000000000104 /* LocationChoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000004 /* LocationChoice.swift */; };
+		AA0000000000000000000105 /* ReportDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000005 /* ReportDraft.swift */; };
+		AA0000000000000000000106 /* ReportSubmission.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000006 /* ReportSubmission.swift */; };
+		AA0000000000000000000107 /* ResourceItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000007 /* ResourceItem.swift */; };
+		AA0000000000000000000108 /* RiskGuidance.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000008 /* RiskGuidance.swift */; };
+		AA0000000000000000000109 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000009 /* APIClient.swift */; };
+		AA0000000000000000000110 /* ConnectivityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000010 /* ConnectivityMonitor.swift */; };
+		AA0000000000000000000111 /* EncryptedReportDraftStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000011 /* EncryptedReportDraftStore.swift */; };
+		AA0000000000000000000112 /* LocalizationCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000012 /* LocalizationCatalog.swift */; };
+		AA0000000000000000000113 /* MockContentService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000013 /* MockContentService.swift */; };
+		AA0000000000000000000114 /* MockReportSubmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000014 /* MockReportSubmitter.swift */; };
+		AA0000000000000000000115 /* ReportDraftStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000015 /* ReportDraftStore.swift */; };
+		AA0000000000000000000116 /* ReportValidation.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000016 /* ReportValidation.swift */; };
+		AA0000000000000000000117 /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000017 /* AppViewModel.swift */; };
+		AA0000000000000000000118 /* ReportFlowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000018 /* ReportFlowViewModel.swift */; };
+		AA0000000000000000000119 /* AmaniPulseRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000019 /* AmaniPulseRootView.swift */; };
+		AA0000000000000000000120 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000020 /* OnboardingView.swift */; };
+		AA0000000000000000000121 /* ReportFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000021 /* ReportFlowView.swift */; };
+		AA0000000000000000000122 /* ReportHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000022 /* ReportHomeView.swift */; };
+		AA0000000000000000000123 /* ResourcesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000023 /* ResourcesView.swift */; };
+		AA0000000000000000000124 /* RiskGuidanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000024 /* RiskGuidanceView.swift */; };
+		AA0000000000000000000125 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000025 /* SettingsView.swift */; };
+		AA0000000000000000000126 /* AppConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000027 /* AppConfiguration.swift */; };
+		AA0000000000000000000127 /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000028 /* AppEnvironment.swift */; };
+			AA0000000000000000000128 /* PrivacyShieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA0000000000000000000029 /* PrivacyShieldView.swift */; };
+			AA0000000000000000000129 /* AccessibilityIdentifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000002A /* AccessibilityIdentifiers.swift */; };
+			AA0000000000000000000130 /* AmaniPulseCitizenAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000002B /* AmaniPulseCitizenAppUITests.swift */; };
+			AA0000000000000000000131 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000002D /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		AA0000000000000000000400 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AA0000000000000000000100 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA0000000000000000000080;
+			remoteInfo = AmaniPulseCitizenApp;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		AA0000000000000000000001 /* AmaniPulseCitizenApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmaniPulseCitizenApp.swift; sourceTree = "<group>"; };
+		AA0000000000000000000002 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Domain/AppLanguage.swift; sourceTree = "<group>"; };
+		AA0000000000000000000003 /* IncidentCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Domain/IncidentCategory.swift; sourceTree = "<group>"; };
+		AA0000000000000000000004 /* LocationChoice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Domain/LocationChoice.swift; sourceTree = "<group>"; };
+		AA0000000000000000000005 /* ReportDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Domain/ReportDraft.swift; sourceTree = "<group>"; };
+		AA0000000000000000000006 /* ReportSubmission.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Domain/ReportSubmission.swift; sourceTree = "<group>"; };
+		AA0000000000000000000007 /* ResourceItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Domain/ResourceItem.swift; sourceTree = "<group>"; };
+		AA0000000000000000000008 /* RiskGuidance.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Domain/RiskGuidance.swift; sourceTree = "<group>"; };
+		AA0000000000000000000009 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Services/APIClient.swift; sourceTree = "<group>"; };
+		AA0000000000000000000010 /* ConnectivityMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Services/ConnectivityMonitor.swift; sourceTree = "<group>"; };
+		AA0000000000000000000011 /* EncryptedReportDraftStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Services/EncryptedReportDraftStore.swift; sourceTree = "<group>"; };
+		AA0000000000000000000012 /* LocalizationCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Services/LocalizationCatalog.swift; sourceTree = "<group>"; };
+		AA0000000000000000000013 /* MockContentService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Services/MockContentService.swift; sourceTree = "<group>"; };
+		AA0000000000000000000014 /* MockReportSubmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Services/MockReportSubmitter.swift; sourceTree = "<group>"; };
+		AA0000000000000000000015 /* ReportDraftStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Services/ReportDraftStore.swift; sourceTree = "<group>"; };
+		AA0000000000000000000016 /* ReportValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Services/ReportValidation.swift; sourceTree = "<group>"; };
+		AA0000000000000000000017 /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/ViewModels/AppViewModel.swift; sourceTree = "<group>"; };
+		AA0000000000000000000018 /* ReportFlowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/ViewModels/ReportFlowViewModel.swift; sourceTree = "<group>"; };
+		AA0000000000000000000019 /* AmaniPulseRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Views/AmaniPulseRootView.swift; sourceTree = "<group>"; };
+		AA0000000000000000000020 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Views/OnboardingView.swift; sourceTree = "<group>"; };
+		AA0000000000000000000021 /* ReportFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Views/ReportFlowView.swift; sourceTree = "<group>"; };
+		AA0000000000000000000022 /* ReportHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Views/ReportHomeView.swift; sourceTree = "<group>"; };
+		AA0000000000000000000023 /* ResourcesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Views/ResourcesView.swift; sourceTree = "<group>"; };
+		AA0000000000000000000024 /* RiskGuidanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Views/RiskGuidanceView.swift; sourceTree = "<group>"; };
+		AA0000000000000000000025 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Views/SettingsView.swift; sourceTree = "<group>"; };
+		AA0000000000000000000026 /* AmaniPulseCitizenApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AmaniPulseCitizenApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA0000000000000000000027 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Domain/AppConfiguration.swift; sourceTree = "<group>"; };
+		AA0000000000000000000028 /* AppEnvironment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Services/AppEnvironment.swift; sourceTree = "<group>"; };
+		AA0000000000000000000029 /* PrivacyShieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Views/PrivacyShieldView.swift; sourceTree = "<group>"; };
+			AA000000000000000000002A /* AccessibilityIdentifiers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ../AmaniPulseCitizen/Sources/AmaniPulseCitizen/Views/AccessibilityIdentifiers.swift; sourceTree = "<group>"; };
+			AA000000000000000000002B /* AmaniPulseCitizenAppUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmaniPulseCitizenAppUITests.swift; sourceTree = "<group>"; };
+			AA000000000000000000002C /* AmaniPulseCitizenAppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AmaniPulseCitizenAppUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+			AA000000000000000000002D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AA0000000000000000000040 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA0000000000000000000041 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AA0000000000000000000050 = {
+			isa = PBXGroup;
+			children = (
+				AA0000000000000000000030 /* AmaniPulseCitizenApp */,
+				AA0000000000000000000031 /* AmaniPulseCitizenAppUITests */,
+				AA0000000000000000000060 /* AmaniPulseCitizenPackageSources */,
+				AA0000000000000000000070 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+			AA0000000000000000000030 /* AmaniPulseCitizenApp */ = {
+				isa = PBXGroup;
+				children = (
+					AA0000000000000000000001 /* AmaniPulseCitizenApp.swift */,
+					AA000000000000000000002D /* Assets.xcassets */,
+				);
+				path = AmaniPulseCitizenApp;
+				sourceTree = "<group>";
+			};
+		AA0000000000000000000031 /* AmaniPulseCitizenAppUITests */ = {
+			isa = PBXGroup;
+			children = (
+				AA000000000000000000002B /* AmaniPulseCitizenAppUITests.swift */,
+			);
+			path = AmaniPulseCitizenAppUITests;
+			sourceTree = "<group>";
+		};
+		AA0000000000000000000060 /* AmaniPulseCitizenPackageSources */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000000000000000000002 /* AppLanguage.swift */,
+				AA0000000000000000000027 /* AppConfiguration.swift */,
+				AA0000000000000000000003 /* IncidentCategory.swift */,
+				AA0000000000000000000004 /* LocationChoice.swift */,
+				AA0000000000000000000005 /* ReportDraft.swift */,
+				AA0000000000000000000006 /* ReportSubmission.swift */,
+				AA0000000000000000000007 /* ResourceItem.swift */,
+				AA0000000000000000000008 /* RiskGuidance.swift */,
+				AA0000000000000000000009 /* APIClient.swift */,
+				AA0000000000000000000028 /* AppEnvironment.swift */,
+				AA0000000000000000000010 /* ConnectivityMonitor.swift */,
+				AA0000000000000000000011 /* EncryptedReportDraftStore.swift */,
+				AA0000000000000000000012 /* LocalizationCatalog.swift */,
+				AA0000000000000000000013 /* MockContentService.swift */,
+				AA0000000000000000000014 /* MockReportSubmitter.swift */,
+				AA0000000000000000000015 /* ReportDraftStore.swift */,
+				AA0000000000000000000016 /* ReportValidation.swift */,
+				AA0000000000000000000017 /* AppViewModel.swift */,
+				AA0000000000000000000018 /* ReportFlowViewModel.swift */,
+				AA0000000000000000000019 /* AmaniPulseRootView.swift */,
+				AA000000000000000000002A /* AccessibilityIdentifiers.swift */,
+				AA0000000000000000000020 /* OnboardingView.swift */,
+				AA0000000000000000000029 /* PrivacyShieldView.swift */,
+				AA0000000000000000000021 /* ReportFlowView.swift */,
+				AA0000000000000000000022 /* ReportHomeView.swift */,
+				AA0000000000000000000023 /* ResourcesView.swift */,
+				AA0000000000000000000024 /* RiskGuidanceView.swift */,
+				AA0000000000000000000025 /* SettingsView.swift */,
+			);
+			name = AmaniPulseCitizenPackageSources;
+			sourceTree = "<group>";
+		};
+		AA0000000000000000000070 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AA0000000000000000000026 /* AmaniPulseCitizenApp.app */,
+				AA000000000000000000002C /* AmaniPulseCitizenAppUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AA0000000000000000000080 /* AmaniPulseCitizenApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA0000000000000000000200 /* Build configuration list for PBXNativeTarget "AmaniPulseCitizenApp" */;
+				buildPhases = (
+					AA0000000000000000000090 /* Sources */,
+					AA0000000000000000000040 /* Frameworks */,
+					AA0000000000000000000092 /* Resources */,
+				);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AmaniPulseCitizenApp;
+			packageProductDependencies = (
+			);
+			productName = AmaniPulseCitizenApp;
+			productReference = AA0000000000000000000026 /* AmaniPulseCitizenApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+		AA0000000000000000000081 /* AmaniPulseCitizenAppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA0000000000000000000201 /* Build configuration list for PBXNativeTarget "AmaniPulseCitizenAppUITests" */;
+			buildPhases = (
+				AA0000000000000000000091 /* Sources */,
+				AA0000000000000000000041 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AA0000000000000000000401 /* PBXTargetDependency */,
+			);
+			name = AmaniPulseCitizenAppUITests;
+			packageProductDependencies = (
+			);
+			productName = AmaniPulseCitizenAppUITests;
+			productReference = AA000000000000000000002C /* AmaniPulseCitizenAppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AA0000000000000000000100 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2640;
+				LastUpgradeCheck = 2640;
+				TargetAttributes = {
+					AA0000000000000000000080 = {
+						CreatedOnToolsVersion = 26.4.1;
+					};
+					AA0000000000000000000081 = {
+						CreatedOnToolsVersion = 26.4.1;
+						TestTargetID = AA0000000000000000000080;
+					};
+				};
+			};
+			buildConfigurationList = AA0000000000000000000210 /* Build configuration list for PBXProject "AmaniPulseCitizenApp" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = AA0000000000000000000050;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = AA0000000000000000000070 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AA0000000000000000000080 /* AmaniPulseCitizenApp */,
+				AA0000000000000000000081 /* AmaniPulseCitizenAppUITests */,
+			);
+		};
+	/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+			AA0000000000000000000092 /* Resources */ = {
+				isa = PBXResourcesBuildPhase;
+				buildActionMask = 2147483647;
+				files = (
+					AA0000000000000000000131 /* Assets.xcassets in Resources */,
+				);
+				runOnlyForDeploymentPostprocessing = 0;
+			};
+/* End PBXResourcesBuildPhase section */
+
+	/* Begin PBXSourcesBuildPhase section */
+		AA0000000000000000000090 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA0000000000000000000101 /* AmaniPulseCitizenApp.swift in Sources */,
+				AA0000000000000000000102 /* AppLanguage.swift in Sources */,
+				AA0000000000000000000126 /* AppConfiguration.swift in Sources */,
+				AA0000000000000000000103 /* IncidentCategory.swift in Sources */,
+				AA0000000000000000000104 /* LocationChoice.swift in Sources */,
+				AA0000000000000000000105 /* ReportDraft.swift in Sources */,
+				AA0000000000000000000106 /* ReportSubmission.swift in Sources */,
+				AA0000000000000000000107 /* ResourceItem.swift in Sources */,
+				AA0000000000000000000108 /* RiskGuidance.swift in Sources */,
+				AA0000000000000000000109 /* APIClient.swift in Sources */,
+				AA0000000000000000000127 /* AppEnvironment.swift in Sources */,
+				AA0000000000000000000110 /* ConnectivityMonitor.swift in Sources */,
+				AA0000000000000000000111 /* EncryptedReportDraftStore.swift in Sources */,
+				AA0000000000000000000112 /* LocalizationCatalog.swift in Sources */,
+				AA0000000000000000000113 /* MockContentService.swift in Sources */,
+				AA0000000000000000000114 /* MockReportSubmitter.swift in Sources */,
+				AA0000000000000000000115 /* ReportDraftStore.swift in Sources */,
+				AA0000000000000000000116 /* ReportValidation.swift in Sources */,
+				AA0000000000000000000117 /* AppViewModel.swift in Sources */,
+				AA0000000000000000000118 /* ReportFlowViewModel.swift in Sources */,
+				AA0000000000000000000119 /* AmaniPulseRootView.swift in Sources */,
+				AA0000000000000000000129 /* AccessibilityIdentifiers.swift in Sources */,
+				AA0000000000000000000120 /* OnboardingView.swift in Sources */,
+				AA0000000000000000000128 /* PrivacyShieldView.swift in Sources */,
+				AA0000000000000000000121 /* ReportFlowView.swift in Sources */,
+				AA0000000000000000000122 /* ReportHomeView.swift in Sources */,
+				AA0000000000000000000123 /* ResourcesView.swift in Sources */,
+				AA0000000000000000000124 /* RiskGuidanceView.swift in Sources */,
+				AA0000000000000000000125 /* SettingsView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA0000000000000000000091 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA0000000000000000000130 /* AmaniPulseCitizenAppUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AA0000000000000000000401 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA0000000000000000000080 /* AmaniPulseCitizenApp */;
+			targetProxy = AA0000000000000000000400 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		AA0000000000000000000300 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		AA0000000000000000000301 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AA0000000000000000000310 /* Debug */ = {
+			isa = XCBuildConfiguration;
+				buildSettings = {
+					ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+					ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = AmaniPulse;
+				INFOPLIST_KEY_AMANIPULSE_API_BASE_URL = "http://127.0.0.1:8000";
+					INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.news";
+					INFOPLIST_KEY_UILaunchScreen_BackgroundColor = LaunchBackground;
+					INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+					INFOPLIST_KEY_UILaunchScreen_ImageName = LaunchLogo;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.amanipulse.citizen;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		AA0000000000000000000311 /* Release */ = {
+			isa = XCBuildConfiguration;
+				buildSettings = {
+					ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+					ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = AmaniPulse;
+				INFOPLIST_KEY_AMANIPULSE_API_BASE_URL = "https://api.amanipulse.example";
+					INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.news";
+					INFOPLIST_KEY_UILaunchScreen_BackgroundColor = LaunchBackground;
+					INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+					INFOPLIST_KEY_UILaunchScreen_ImageName = LaunchLogo;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.amanipulse.citizen;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		AA0000000000000000000320 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.amanipulse.citizen.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = AmaniPulseCitizenApp;
+			};
+			name = Debug;
+		};
+		AA0000000000000000000321 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGNING_ALLOWED = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = org.amanipulse.citizen.uitests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_TARGET_NAME = AmaniPulseCitizenApp;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AA0000000000000000000200 /* Build configuration list for PBXNativeTarget "AmaniPulseCitizenApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA0000000000000000000310 /* Debug */,
+				AA0000000000000000000311 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA0000000000000000000201 /* Build configuration list for PBXNativeTarget "AmaniPulseCitizenAppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA0000000000000000000320 /* Debug */,
+				AA0000000000000000000321 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA0000000000000000000210 /* Build configuration list for PBXProject "AmaniPulseCitizenApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA0000000000000000000300 /* Debug */,
+				AA0000000000000000000301 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AA0000000000000000000100 /* Project object */;
+}
