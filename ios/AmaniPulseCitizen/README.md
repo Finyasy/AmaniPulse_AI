@@ -14,6 +14,7 @@ The package currently contains:
 - Network-aware submission handling that keeps unsent reports on device.
 - Local report receipts, retry controls for waiting reports, and status refresh for submitted reports.
 - App icon, accent color, and launch image assets wired into the Xcode app target.
+- App privacy manifest declaring no tracking or collected data and documenting local UserDefaults access.
 - XCTest coverage for validation, localization, API payloads, and draft lifecycle behavior.
 - XCUITest coverage for onboarding, saving a report draft, switching language, online submission, status refresh, and offline recovery on an iPhone simulator.
 - A privacy shield that obscures app content when the app is backgrounded or inactive.
@@ -74,5 +75,6 @@ AMANIPULSE_DYNAMIC_TYPE_SIZE=accessibility3
 
 1. Connect the confirmed Andela x Open Accelerator staging API base URL.
 2. Expand VoiceOver QA beyond identifiers into manual screen-reader walkthroughs.
-3. Add App Store privacy nutrition labels and release signing configuration.
-4. Run a device-family pass on an installed iPhone 16 Pro Max simulator or physical device before release.
+3. Convert the MVP release checklist into TestFlight submission metadata.
+4. Add Apple Developer signing configuration.
+5. Run a device-family pass on an installed iPhone 16 Pro Max simulator or physical device before release.
