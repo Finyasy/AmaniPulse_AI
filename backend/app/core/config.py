@@ -17,6 +17,9 @@ class Settings(BaseModel):
     redis_url: str = getenv("REDIS_URL", "redis://localhost:56379/0")
     enable_ai_worker: bool = getenv("ENABLE_AI_WORKER", "true").lower() == "true"
     celery_task_always_eager: bool = getenv("CELERY_TASK_ALWAYS_EAGER", "true").lower() == "true"
+    log_level: str = getenv("LOG_LEVEL", "INFO")
+    log_format: str = getenv("LOG_FORMAT", "json")
+    request_id_header: str = getenv("REQUEST_ID_HEADER", "X-Request-ID")
     report_encryption_key: str = getenv(
         "REPORT_ENCRYPTION_KEY",
         "YW1hbmlwdWxzZS1kZXYtcmVwb3J0LWtleS0zMmIhISE=",

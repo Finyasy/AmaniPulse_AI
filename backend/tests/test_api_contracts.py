@@ -12,6 +12,28 @@ def test_health_check() -> None:
     response = client.get("/v1/health")
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
+    assert response.json()["service"] == "amanipulse-api"
+    assert response.json()["version"] == "0.1.0"
+
+
+def test_readiness_check_uses_memory_storage_by_default() -> None:
+    response = client.get("/v1/ready")
+    assert response.status_code == 200
+    assert response.json()["status"] == "ready"
+    assert response.json()["checks"]["storage"] == "memory"
+
+
+def test_request_id_header_is_preserved_or_generated() -> None:
+    custom_response = client.get(
+        "/v1/health",
+        headers={"X-Request-ID": "ios-smoke-test-request"},
+    )
+    assert custom_response.status_code == 200
+    assert custom_response.headers["X-Request-ID"] == "ios-smoke-test-request"
+
+    generated_response = client.get("/v1/health")
+    assert generated_response.status_code == 200
+    assert generated_response.headers["X-Request-ID"]
 
 
 def test_submit_report_and_fetch_status() -> None:

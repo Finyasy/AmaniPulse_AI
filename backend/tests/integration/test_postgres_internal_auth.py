@@ -15,6 +15,14 @@ pytestmark = pytest.mark.skipif(
 client = TestClient(app)
 
 
+def test_postgres_readiness_checks_database() -> None:
+    response = client.get("/v1/ready")
+    assert response.status_code == 200
+    assert response.json()["status"] == "ready"
+    assert response.json()["checks"]["storage"] == "postgres"
+    assert response.json()["checks"]["database"] == "ok"
+
+
 def test_postgres_internal_review_uses_hashed_api_key_identity() -> None:
     client_report_id = f"pg-review-{uuid4()}"
     create_response = client.post(
