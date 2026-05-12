@@ -47,11 +47,21 @@ xcodebuild test -project ios/AmaniPulseCitizenApp/AmaniPulseCitizenApp.xcodeproj
   test
 ```
 
-The current local simulator verification used iPhone 17 Pro Max as the large-screen device because an iPhone 16 Pro Max simulator is not installed in this Xcode runtime. The app target supports iPhone 16 Pro Max-class devices on iOS 17 and newer.
+The current local simulator verification uses an `AmaniPulse iPhone 16 Pro Max` simulator on the installed iOS runtime. The app target supports iPhone 16 Pro Max-class devices on iOS 17 and newer.
+
+## Run Local MVP Demo
+
+From the repo root:
+
+```bash
+scripts/local_mvp_demo.sh
+```
+
+The script starts the FastAPI backend at `http://127.0.0.1:8000`, smoke-checks the local API, builds the Debug iPhone simulator app, creates or reuses an `AmaniPulse iPhone 16 Pro Max` simulator, installs the app, opens Simulator, and launches AmaniPulse against the local backend.
 
 ## Accelerator And Staging Configuration
 
-The app defaults to mock services so demos remain safe and deterministic. Use environment variables to point Debug builds at local or accelerator-provided staging APIs:
+The Swift package defaults to mock services so tests remain safe and deterministic. The Debug app target is configured for the local API by default. Use environment variables to override the app for local or accelerator-provided staging APIs:
 
 ```bash
 AMANIPULSE_API_PROFILE=local

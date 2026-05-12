@@ -17,15 +17,18 @@ public enum AppEnvironment: Equatable, Sendable {
     ) -> AppEnvironment {
         resolve(
             environment: processInfo.environment,
+            bundleAPIProfile: bundle.object(forInfoDictionaryKey: "AMANIPULSE_API_PROFILE") as? String,
             bundleAPIBaseURL: bundle.object(forInfoDictionaryKey: "AMANIPULSE_API_BASE_URL") as? String
         )
     }
 
     public static func resolve(
         environment: [String: String],
+        bundleAPIProfile: String? = nil,
         bundleAPIBaseURL: String?
     ) -> AppEnvironment {
-        let profile = APIProfile(rawValue: environment["AMANIPULSE_API_PROFILE"] ?? "") ?? legacyProfile(from: environment)
+        let profileName = environment["AMANIPULSE_API_PROFILE"] ?? bundleAPIProfile ?? ""
+        let profile = APIProfile(rawValue: profileName) ?? legacyProfile(from: environment)
         guard profile != .mock else {
             return .mock
         }

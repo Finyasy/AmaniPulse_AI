@@ -50,6 +50,38 @@ final class AppEnvironmentTests: XCTestCase {
         )
     }
 
+    func testBundleProfileAllowsDebugBuildToUseLocalBackendWhenTappedFromSimulator() throws {
+        let environment = AppEnvironment.resolve(
+            environment: [:],
+            bundleAPIProfile: "local",
+            bundleAPIBaseURL: "http://127.0.0.1:8000"
+        )
+
+        XCTAssertEqual(
+            environment,
+            .remote(profile: .local, baseURL: try XCTUnwrap(URL(string: "http://127.0.0.1:8000")))
+        )
+    }
+
+    func testEnvironmentProfileOverridesBundleProfile() throws {
+        let environment = AppEnvironment.resolve(
+            environment: [
+                "AMANIPULSE_API_PROFILE": "staging",
+                "AMANIPULSE_API_BASE_URL": "https://accelerator-staging.amanipulse.test"
+            ],
+            bundleAPIProfile: "local",
+            bundleAPIBaseURL: "http://127.0.0.1:8000"
+        )
+
+        XCTAssertEqual(
+            environment,
+            .remote(
+                profile: .staging,
+                baseURL: try XCTUnwrap(URL(string: "https://accelerator-staging.amanipulse.test"))
+            )
+        )
+    }
+
     func testInvalidRemoteURLFallsBackToMock() {
         let environment = AppEnvironment.resolve(
             environment: [
