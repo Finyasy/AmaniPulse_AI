@@ -103,6 +103,7 @@ class ReviewService:
             incident_time=report.incident_time,
             received_at=report.received_at,
             updated_at=report.updated_at,
+            county_code=report.county_code,
             county=report.county,
             area_label=report.location.area_label,
             language=report.language,

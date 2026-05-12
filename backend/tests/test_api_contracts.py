@@ -117,6 +117,15 @@ def test_web_citizen_portal_source_is_supported() -> None:
     assert response.status_code == 201
 
 
+def test_app_config_hides_unconfigured_support_channels() -> None:
+    response = client.get("/v1/app-config?platform=ios&version=1.0.0&language=en")
+    assert response.status_code == 200
+    body = response.json()
+    assert body["feature_flags"]["support_channels_enabled"] is False
+    assert body["support_channels"] == {}
+    assert "TBD" not in str(body)
+
+
 def test_submit_report_and_fetch_status() -> None:
     payload = _report_payload("local-test-001")
 
@@ -138,6 +147,7 @@ def _report_payload(client_report_id: str) -> dict[str, object]:
         "location": {
             "mode": "manual_area",
             "country": "KE",
+            "county_code": "KE-047",
             "county": "Nairobi",
             "area_label": "Kasarani",
         },
@@ -183,6 +193,7 @@ def test_internal_review_flow_requires_token_and_applies_decision() -> None:
         "location": {
             "mode": "manual_area",
             "country": "KE",
+            "county_code": "KE-047",
             "county": "Nairobi",
             "area_label": "Kasarani",
         },
@@ -222,6 +233,7 @@ def test_internal_review_flow_requires_token_and_applies_decision() -> None:
     )
     assert detail_response.status_code == 200
     assert "attack near a rally" in detail_response.json()["description"]
+    assert detail_response.json()["county_code"] == "KE-047"
 
     decision_response = client.post(
         f"/v1/internal/review/reports/{report_reference}/decision",

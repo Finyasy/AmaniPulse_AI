@@ -27,6 +27,8 @@ Implemented now:
 - Public report payload-size and rate-limit controls.
 - Privacy-preserving duplicate report signals.
 - Standard API error envelope.
+- Optional report `county_code` alignment with county risk lookups.
+- App config hides unconfigured support channels instead of returning placeholders.
 - Production Dockerfile and backend deployment runbook.
 - Tests for the core API contracts.
 
@@ -176,6 +178,23 @@ Citizen reports may come from:
 Internal review and partner dashboard APIs stay separate from citizen APIs and require
 `X-Internal-Token`.
 
+## Location Contract
+
+Report locations support both human-readable county names and canonical Kenya county codes:
+
+```json
+{
+  "mode": "manual_area",
+  "country": "KE",
+  "county_code": "KE-047",
+  "county": "Nairobi",
+  "area_label": "Kasarani"
+}
+```
+
+`county_code` is optional for backward compatibility, but citizen clients should send it whenever
+available. Backend risk aggregation prefers `county_code` and falls back to county-name lookup.
+
 ## Error Shape
 
 All backend errors should use the same envelope:
@@ -276,6 +295,9 @@ KE-001 Mombasa
 KE-042 Kisumu
 KE-047 Nairobi
 ```
+
+Use these same codes in report payloads, iPhone risk guidance, public web reporting, partner maps,
+and `/v1/risk/county/{county_code}` requests.
 
 ## Important Safety Notes
 

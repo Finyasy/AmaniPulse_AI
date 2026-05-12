@@ -19,6 +19,7 @@ class ReportModel(Base):
     incident_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
     location_mode: Mapped[str] = mapped_column(String(40), index=True)
     country: Mapped[str | None] = mapped_column(String(2), nullable=True, index=True)
+    county_code: Mapped[str | None] = mapped_column(String(16), nullable=True, index=True)
     county: Mapped[str | None] = mapped_column(String(80), nullable=True, index=True)
     area_label: Mapped[str | None] = mapped_column(String(120), nullable=True)
     latitude_rounded: Mapped[float | None] = mapped_column(Float, nullable=True)

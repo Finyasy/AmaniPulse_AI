@@ -20,7 +20,7 @@ class ReportService:
         settings = get_settings()
         duplicate_signal, duplicate_fingerprint = duplicate_report_guard.assess(
             category=payload.category.value,
-            county=payload.location.county,
+            county=payload.location.county_code or payload.location.county,
             description=payload.description,
             window_seconds=settings.duplicate_report_window_seconds,
         )
