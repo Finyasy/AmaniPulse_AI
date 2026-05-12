@@ -12,6 +12,28 @@ def test_health_check() -> None:
     response = client.get("/v1/health")
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
+    assert response.json()["service"] == "amanipulse-api"
+    assert response.json()["version"] == "0.1.0"
+
+
+def test_readiness_check_uses_memory_storage_by_default() -> None:
+    response = client.get("/v1/ready")
+    assert response.status_code == 200
+    assert response.json()["status"] == "ready"
+    assert response.json()["checks"]["storage"] == "memory"
+
+
+def test_request_id_header_is_preserved_or_generated() -> None:
+    custom_response = client.get(
+        "/v1/health",
+        headers={"X-Request-ID": "ios-smoke-test-request"},
+    )
+    assert custom_response.status_code == 200
+    assert custom_response.headers["X-Request-ID"] == "ios-smoke-test-request"
+
+    generated_response = client.get("/v1/health")
+    assert generated_response.status_code == 200
+    assert generated_response.headers["X-Request-ID"]
 
 
 def test_submit_report_and_fetch_status() -> None:
@@ -91,6 +113,12 @@ def test_internal_review_flow_requires_token_and_applies_decision() -> None:
     unauthorized = client.get("/v1/internal/review/queue")
     assert unauthorized.status_code == 401
 
+    invalid = client.get(
+        "/v1/internal/review/queue",
+        headers={"X-Internal-Token": "not-the-review-token"},
+    )
+    assert invalid.status_code == 401
+
     headers = {"X-Internal-Token": "dev-internal-review-token"}
     queue_response = client.get("/v1/internal/review/queue", headers=headers)
     assert queue_response.status_code == 200
@@ -109,12 +137,13 @@ def test_internal_review_flow_requires_token_and_applies_decision() -> None:
         headers=headers,
         json={
             "status": "aggregated",
-            "reviewer_id": "reviewer-1",
+            "reviewer_id": "spoofed-reviewer",
             "note": "Included in aggregate monitoring.",
         },
     )
     assert decision_response.status_code == 200
     assert decision_response.json()["status"] == "aggregated"
+    assert decision_response.json()["reviewer_id"] == "dev-reviewer"
 
     events_response = client.get(
         f"/v1/internal/review/reports/{report_reference}/events",
@@ -125,8 +154,46 @@ def test_internal_review_flow_requires_token_and_applies_decision() -> None:
     assert len(events) == 1
     assert events[0]["previous_status"] == "under_review"
     assert events[0]["new_status"] == "aggregated"
-    assert events[0]["reviewer_id"] == "reviewer-1"
+    assert events[0]["reviewer_id"] == "dev-reviewer"
 
     status_response = client.get(f"/v1/reports/{report_reference}/status")
     assert status_response.status_code == 200
     assert status_response.json()["status"] == "aggregated"
+
+
+def test_pii_hints_move_report_to_review_without_exposing_values() -> None:
+    payload = {
+        "client_report_id": "local-pii-001",
+        "category": "misinformation_or_rumor",
+        "description": "A rumor includes person@example.com and +254712345678.",
+        "incident_time": (datetime.now(UTC) - timedelta(minutes=5)).isoformat(),
+        "location": {
+            "mode": "manual_area",
+            "country": "KE",
+            "county": "Nairobi",
+            "area_label": "Kasarani",
+        },
+        "language": "en",
+        "source": "ios_citizen_app",
+        "app_version": "1.0.0",
+        "consents": {
+            "anonymous_submission": True,
+            "risk_analysis": True,
+        },
+    }
+
+    create_response = client.post("/v1/reports", json=payload)
+    assert create_response.status_code == 201
+    report_reference = create_response.json()["report_reference"]
+
+    headers = {"X-Internal-Token": "dev-internal-review-token"}
+    detail_response = client.get(
+        f"/v1/internal/review/reports/{report_reference}",
+        headers=headers,
+    )
+    assert detail_response.status_code == 200
+    labels = detail_response.json()["ai_labels"]
+    assert labels["pii_detected"] is True
+    assert labels["safety_flags"] == "email,phone_number"
+    assert "person@example.com" not in labels["safety_flags"]
+    assert "+254712345678" not in labels["safety_flags"]

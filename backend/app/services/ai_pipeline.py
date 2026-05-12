@@ -1,6 +1,7 @@
 from app.domain.enums import IncidentCategory, ReportStatus
 from app.domain.records import ReportRecord
 from app.repositories.protocols import ReportStore, RiskStore
+from app.services.safety_service import safety_service
 
 
 class AiPipeline:
@@ -54,6 +55,7 @@ class AiPipeline:
     def classify(self, record: ReportRecord) -> dict[str, str | int | float | bool]:
         text = record.description.lower()
         urgent_matches = [word for word in self._urgent_words if word in text]
+        safety = safety_service.assess_text(record.description)
         base_score = 25
 
         if record.category in self._high_risk_categories:
@@ -62,10 +64,14 @@ class AiPipeline:
             base_score += min(30, len(urgent_matches) * 10)
         if record.category == IncidentCategory.misinformation_or_rumor:
             base_score += 10
+        if safety.pii_detected:
+            base_score += 5
 
         severity_score = min(base_score, 100)
         needs_human_review = (
-            severity_score >= 65 or record.category == IncidentCategory.active_violence
+            severity_score >= 65
+            or record.category == IncidentCategory.active_violence
+            or safety.pii_detected
         )
 
         return {
@@ -73,6 +79,9 @@ class AiPipeline:
             "urgency": "high" if severity_score >= 65 else "standard",
             "needs_human_review": needs_human_review,
             "matched_escalation_terms": len(urgent_matches),
+            "pii_detected": safety.pii_detected,
+            "safety_flag_count": safety.flag_count,
+            "safety_flags": safety.flag_summary,
             "model_version": "rules-mvp-0.1",
         }
 

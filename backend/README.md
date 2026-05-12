@@ -21,6 +21,9 @@ Implemented now:
 - PostgreSQL/PostGIS SQLAlchemy models.
 - Alembic migration for report and county risk tables.
 - Baseline risk guidance seeded for all 47 Kenya counties.
+- Hashed internal review API keys with reviewer identity derived from the token.
+- Request ID middleware and safe structured request logs with no report text.
+- Readiness checks for deployment health probes.
 - Tests for the core API contracts.
 
 Prepared for next:
@@ -102,10 +105,17 @@ uv run pytest
 uv run ruff check .
 ```
 
+Run Postgres-backed integration tests when Docker services are up:
+
+```bash
+RUN_POSTGRES_TESTS=1 STORAGE_BACKEND=postgres uv run pytest tests/integration
+```
+
 ## API Endpoints
 
 ```text
 GET  /v1/health
+GET  /v1/ready
 GET  /v1/incident-taxonomy?language=en
 POST /v1/reports
 GET  /v1/reports/{report_reference}/status
@@ -128,9 +138,26 @@ Backend responsibilities:
 - Validate and minimize data.
 - Encrypt sensitive report descriptions before storing them.
 - Run classification and escalation logic.
+- Add non-sensitive PII/safety flags for human reviewers.
 - Update aggregated county risk guidance.
 - Keep high-risk reports available for future human review.
 - Serve calm, public, non-sensitive guidance back to the iPhone app.
+
+## Observability
+
+Every response includes a request ID header. Clients may send `X-Request-ID`; otherwise the
+API generates one. Request logs include only production-safe metadata:
+
+- request ID
+- HTTP method
+- path without query string
+- status code
+- duration
+- environment
+
+Logs must not include report bodies, descriptions, tokens, exact locations, phone numbers, or
+other personally identifying values. Use `LOG_FORMAT=json` for hosted environments and
+`LOG_LEVEL=INFO` unless debugging a temporary non-production issue.
 
 ## Worker Mode
 
@@ -145,6 +172,10 @@ Internal review endpoints require:
 ```text
 X-Internal-Token: <INTERNAL_API_TOKEN>
 ```
+
+In PostgreSQL mode, internal tokens are stored as SHA-256 hashes in the
+`internal_api_keys` table. The request body cannot choose the reviewer identity;
+review events use the reviewer attached to the authenticated key.
 
 Use them to inspect reports marked `under_review` and apply safe review decisions:
 
@@ -177,7 +208,6 @@ KE-047 Nairobi
 ## Next Implementation Milestones
 
 1. Add PostGIS county centroids or boundaries for spatial aggregation.
-2. Add Postgres-backed integration tests behind an opt-in environment flag.
-3. Add stronger internal authentication for reviewers.
-4. Add PII detection/redaction hints for report descriptions.
-5. Add deployment config for Render, Fly, AWS, or another selected host.
+2. Add role-scoped reviewer permissions beyond the default reviewer role.
+3. Add deployment config for Render, Fly, AWS, or another selected host.
+4. Add rate limiting and duplicate/spam controls for public report submission.
