@@ -107,7 +107,11 @@ class ReviewService:
             area_label=report.location.area_label,
             language=report.language,
             severity_score=self._optional_int(report.ai_labels.get("severity_score")),
+            risk_score=self._optional_int(report.ai_labels.get("risk_score")),
+            confidence=self._optional_float(report.ai_labels.get("confidence")),
             urgency=self._optional_str(report.ai_labels.get("urgency")),
+            review_priority=self._optional_str(report.ai_labels.get("review_priority")),
+            recommended_action=self._optional_str(report.ai_labels.get("recommended_action")),
             needs_human_review=self._optional_bool(report.ai_labels.get("needs_human_review")),
         )
 
@@ -116,6 +120,9 @@ class ReviewService:
 
     def _optional_str(self, value: object) -> str | None:
         return value if isinstance(value, str) else None
+
+    def _optional_float(self, value: object) -> float | None:
+        return value if isinstance(value, int | float) else None
 
     def _optional_bool(self, value: object) -> bool | None:
         return value if isinstance(value, bool) else None

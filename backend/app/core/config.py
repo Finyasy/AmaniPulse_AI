@@ -37,6 +37,9 @@ class Settings(BaseModel):
     report_rate_limit_window_seconds: int = Field(
         default_factory=lambda: int(getenv("REPORT_RATE_LIMIT_WINDOW_SECONDS", "60"))
     )
+    duplicate_report_window_seconds: int = Field(
+        default_factory=lambda: int(getenv("DUPLICATE_REPORT_WINDOW_SECONDS", "300"))
+    )
     report_encryption_key: str = Field(
         default_factory=lambda: getenv(
             "REPORT_ENCRYPTION_KEY",

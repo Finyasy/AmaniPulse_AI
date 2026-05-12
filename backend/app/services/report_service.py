@@ -2,6 +2,8 @@ import secrets
 import string
 from datetime import UTC, datetime
 
+from app.core.abuse import duplicate_report_guard
+from app.core.config import get_settings
 from app.domain.enums import ReportStatus
 from app.domain.records import ReportRecord
 from app.domain.schemas import ReportCreate, ReportReceipt, ReportStatusResponse
@@ -15,6 +17,13 @@ class ReportService:
         store: ReportStore,
     ) -> tuple[ReportReceipt, ReportRecord]:
         now = datetime.now(UTC)
+        settings = get_settings()
+        duplicate_signal, duplicate_fingerprint = duplicate_report_guard.assess(
+            category=payload.category.value,
+            county=payload.location.county,
+            description=payload.description,
+            window_seconds=settings.duplicate_report_window_seconds,
+        )
         record = ReportRecord(
             report_reference=self._new_reference(),
             client_report_id=payload.client_report_id,
@@ -28,6 +37,10 @@ class ReportService:
             status=ReportStatus.received,
             received_at=now,
             updated_at=now,
+            ai_labels={
+                "duplicate_signal": duplicate_signal,
+                "duplicate_fingerprint": duplicate_fingerprint,
+            },
         )
         stored = await store.create(record)
         receipt = ReportReceipt(
