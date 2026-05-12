@@ -24,6 +24,8 @@ Implemented now:
 - Hashed internal review API keys with reviewer identity derived from the token.
 - Request ID middleware and safe structured request logs with no report text.
 - Readiness checks for deployment health probes.
+- Public report payload-size and rate-limit controls.
+- Production Dockerfile and backend deployment runbook.
 - Tests for the core API contracts.
 
 Prepared for next:
@@ -111,6 +113,23 @@ Run Postgres-backed integration tests when Docker services are up:
 RUN_POSTGRES_TESTS=1 STORAGE_BACKEND=postgres uv run pytest tests/integration
 ```
 
+## Build Container
+
+From the repository root:
+
+```bash
+docker build -t amanipulse-backend ./backend
+docker run --rm -p 8000:8000 --env-file backend/.env amanipulse-backend
+```
+
+Run migrations once per release before routing traffic:
+
+```bash
+STORAGE_BACKEND=postgres uv run alembic upgrade head
+```
+
+See `docs/deployment.md` for the backend deployment runbook.
+
 ## API Endpoints
 
 ```text
@@ -158,6 +177,17 @@ API generates one. Request logs include only production-safe metadata:
 Logs must not include report bodies, descriptions, tokens, exact locations, phone numbers, or
 other personally identifying values. Use `LOG_FORMAT=json` for hosted environments and
 `LOG_LEVEL=INFO` unless debugging a temporary non-production issue.
+
+## Public Abuse Controls
+
+`POST /v1/reports` has MVP guardrails for safer public launch:
+
+- `MAX_REQUEST_BODY_BYTES` rejects oversized submissions before validation.
+- `REPORT_RATE_LIMIT_COUNT` and `REPORT_RATE_LIMIT_WINDOW_SECONDS` throttle bursts from the
+  same network client.
+- Rate limiting is in-memory and intended as a first MVP layer. For multi-instance production,
+  move this counter to Redis so limits apply consistently across API replicas.
+- The limiter does not log or persist report text, phone numbers, exact location, or user identity.
 
 ## Worker Mode
 
@@ -209,5 +239,5 @@ KE-047 Nairobi
 
 1. Add PostGIS county centroids or boundaries for spatial aggregation.
 2. Add role-scoped reviewer permissions beyond the default reviewer role.
-3. Add deployment config for Render, Fly, AWS, or another selected host.
-4. Add rate limiting and duplicate/spam controls for public report submission.
+3. Move public rate limiting to Redis for multi-instance deployments.
+4. Add duplicate/spam controls for public report submission.

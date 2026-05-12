@@ -3,9 +3,12 @@ from uuid import uuid4
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette import status
 from starlette.requests import Request
+from starlette.responses import JSONResponse
 
 from app.api.v1.router import api_router
+from app.core.abuse import report_rate_limiter
 from app.core.config import get_settings
 from app.core.logging import access_logger, configure_logging
 from app.core.observability import request_id_context
@@ -27,6 +30,47 @@ def create_app() -> FastAPI:
         allow_methods=["GET", "POST"],
         allow_headers=["Content-Type"],
     )
+
+    @app.middleware("http")
+    async def public_abuse_protection_middleware(request: Request, call_next):
+        if request.method == "POST" and request.url.path == "/v1/reports":
+            content_length = request.headers.get("content-length")
+            payload_size = int(content_length) if content_length and content_length.isdigit() else 0
+            if (
+                content_length is not None
+                and payload_size > settings.max_request_body_bytes
+            ):
+                return JSONResponse(
+                    status_code=status.HTTP_413_CONTENT_TOO_LARGE,
+                    content={
+                        "detail": {
+                            "code": "payload_too_large",
+                            "message": "The report payload is too large.",
+                            "retryable": False,
+                        }
+                    },
+                )
+
+            client_key = request.client.host if request.client else "unknown"
+            allowed, retry_after = report_rate_limiter.allow(
+                key=client_key,
+                limit=settings.report_rate_limit_count,
+                window_seconds=settings.report_rate_limit_window_seconds,
+            )
+            if not allowed:
+                return JSONResponse(
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                    headers={"Retry-After": str(retry_after)},
+                    content={
+                        "detail": {
+                            "code": "rate_limited",
+                            "message": "Too many reports were submitted in a short period.",
+                            "retryable": True,
+                        }
+                    },
+                )
+
+        return await call_next(request)
 
     @app.middleware("http")
     async def request_observability_middleware(request: Request, call_next):
