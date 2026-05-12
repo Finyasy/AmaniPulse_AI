@@ -1,9 +1,12 @@
 from datetime import UTC, datetime, timedelta
+from uuid import uuid4
 
 from fastapi.testclient import TestClient
 
+from app.core.abuse import report_rate_limiter
+from app.core.config import get_settings
 from app.domain.counties import KENYA_COUNTY_RISK_SEEDS
-from app.main import app
+from app.main import app, create_app
 
 client = TestClient(app)
 
@@ -36,9 +39,64 @@ def test_request_id_header_is_preserved_or_generated() -> None:
     assert generated_response.headers["X-Request-ID"]
 
 
+def test_report_payload_size_limit_can_reject_large_public_submissions(monkeypatch) -> None:
+    monkeypatch.setenv("MAX_REQUEST_BODY_BYTES", "200")
+    get_settings.cache_clear()
+    report_rate_limiter.reset()
+    try:
+        limited_client = TestClient(create_app())
+        response = limited_client.post(
+            "/v1/reports",
+            json=_report_payload(f"oversize-{uuid4()}"),
+        )
+        assert response.status_code == 413
+        assert response.json()["detail"]["code"] == "payload_too_large"
+    finally:
+        get_settings.cache_clear()
+        report_rate_limiter.reset()
+
+
+def test_report_rate_limit_throttles_public_submission_bursts(monkeypatch) -> None:
+    monkeypatch.setenv("MAX_REQUEST_BODY_BYTES", "16000")
+    monkeypatch.setenv("REPORT_RATE_LIMIT_COUNT", "1")
+    monkeypatch.setenv("REPORT_RATE_LIMIT_WINDOW_SECONDS", "60")
+    get_settings.cache_clear()
+    report_rate_limiter.reset()
+    try:
+        limited_client = TestClient(create_app())
+        first_response = limited_client.post(
+            "/v1/reports",
+            json=_report_payload(f"rate-first-{uuid4()}"),
+        )
+        assert first_response.status_code == 201
+
+        second_response = limited_client.post(
+            "/v1/reports",
+            json=_report_payload(f"rate-second-{uuid4()}"),
+        )
+        assert second_response.status_code == 429
+        assert second_response.json()["detail"]["code"] == "rate_limited"
+        assert second_response.headers["Retry-After"]
+    finally:
+        get_settings.cache_clear()
+        report_rate_limiter.reset()
+
+
 def test_submit_report_and_fetch_status() -> None:
-    payload = {
-        "client_report_id": "local-test-001",
+    payload = _report_payload("local-test-001")
+
+    create_response = client.post("/v1/reports", json=payload)
+    assert create_response.status_code == 201
+    report_reference = create_response.json()["report_reference"]
+
+    status_response = client.get(f"/v1/reports/{report_reference}/status")
+    assert status_response.status_code == 200
+    assert status_response.json()["report_reference"] == report_reference
+
+
+def _report_payload(client_report_id: str) -> dict[str, object]:
+    return {
+        "client_report_id": client_report_id,
         "category": "voter_intimidation",
         "description": "People are being warned not to attend a registration event.",
         "incident_time": (datetime.now(UTC) - timedelta(minutes=5)).isoformat(),
@@ -56,14 +114,6 @@ def test_submit_report_and_fetch_status() -> None:
             "risk_analysis": True,
         },
     }
-
-    create_response = client.post("/v1/reports", json=payload)
-    assert create_response.status_code == 201
-    report_reference = create_response.json()["report_reference"]
-
-    status_response = client.get(f"/v1/reports/{report_reference}/status")
-    assert status_response.status_code == 200
-    assert status_response.json()["report_reference"] == report_reference
 
 
 def test_risk_guidance() -> None:
