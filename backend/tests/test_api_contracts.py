@@ -1,14 +1,24 @@
 from datetime import UTC, datetime, timedelta
 from uuid import uuid4
 
+import pytest
 from fastapi.testclient import TestClient
 
-from app.core.abuse import report_rate_limiter
+from app.core.abuse import duplicate_report_guard, report_rate_limiter
 from app.core.config import get_settings
 from app.domain.counties import KENYA_COUNTY_RISK_SEEDS
 from app.main import app, create_app
 
 client = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def reset_public_abuse_guards():
+    report_rate_limiter.reset()
+    duplicate_report_guard.reset()
+    yield
+    report_rate_limiter.reset()
+    duplicate_report_guard.reset()
 
 
 def test_health_check() -> None:
@@ -50,10 +60,11 @@ def test_report_payload_size_limit_can_reject_large_public_submissions(monkeypat
             json=_report_payload(f"oversize-{uuid4()}"),
         )
         assert response.status_code == 413
-        assert response.json()["detail"]["code"] == "payload_too_large"
+        assert response.json()["error"]["code"] == "payload_too_large"
     finally:
         get_settings.cache_clear()
         report_rate_limiter.reset()
+        duplicate_report_guard.reset()
 
 
 def test_report_rate_limit_throttles_public_submission_bursts(monkeypatch) -> None:
@@ -75,11 +86,35 @@ def test_report_rate_limit_throttles_public_submission_bursts(monkeypatch) -> No
             json=_report_payload(f"rate-second-{uuid4()}"),
         )
         assert second_response.status_code == 429
-        assert second_response.json()["detail"]["code"] == "rate_limited"
+        assert second_response.json()["error"]["code"] == "rate_limited"
         assert second_response.headers["Retry-After"]
     finally:
         get_settings.cache_clear()
         report_rate_limiter.reset()
+        duplicate_report_guard.reset()
+
+
+def test_validation_errors_use_standard_error_shape() -> None:
+    response = client.post(
+        "/v1/reports",
+        json={
+            **_report_payload(f"invalid-{uuid4()}"),
+            "source": "unknown_client",
+        },
+    )
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "validation_error"
+
+
+def test_web_citizen_portal_source_is_supported() -> None:
+    response = client.post(
+        "/v1/reports",
+        json={
+            **_report_payload(f"web-report-{uuid4()}"),
+            "source": "web_citizen_portal",
+        },
+    )
+    assert response.status_code == 201
 
 
 def test_submit_report_and_fetch_status() -> None:
@@ -127,6 +162,10 @@ def test_risk_guidance() -> None:
     assert response.status_code == 200
     assert response.json()["county_name"] == "Mombasa"
 
+    response = client.get("/v1/risk/county/KE-30")
+    assert response.status_code == 404
+    assert response.json()["error"]["code"] == "county_not_found"
+
 
 def test_taxonomy_supports_swahili() -> None:
     response = client.get("/v1/incident-taxonomy?language=sw")
@@ -162,12 +201,14 @@ def test_internal_review_flow_requires_token_and_applies_decision() -> None:
 
     unauthorized = client.get("/v1/internal/review/queue")
     assert unauthorized.status_code == 401
+    assert unauthorized.json()["error"]["code"] == "unauthorized"
 
     invalid = client.get(
         "/v1/internal/review/queue",
         headers={"X-Internal-Token": "not-the-review-token"},
     )
     assert invalid.status_code == 401
+    assert invalid.json()["error"]["code"] == "unauthorized"
 
     headers = {"X-Internal-Token": "dev-internal-review-token"}
     queue_response = client.get("/v1/internal/review/queue", headers=headers)
@@ -245,5 +286,62 @@ def test_pii_hints_move_report_to_review_without_exposing_values() -> None:
     labels = detail_response.json()["ai_labels"]
     assert labels["pii_detected"] is True
     assert labels["safety_flags"] == "email,phone_number"
+    assert labels["recommended_action"] == "human_review"
+    assert labels["review_priority"] == "high"
     assert "person@example.com" not in labels["safety_flags"]
     assert "+254712345678" not in labels["safety_flags"]
+
+
+def test_decision_intelligence_outputs_richer_review_labels() -> None:
+    payload = {
+        **_report_payload(f"decision-{uuid4()}"),
+        "category": "violence_threat",
+        "description": "People are threatening an armed attack near a rally.",
+    }
+    create_response = client.post("/v1/reports", json=payload)
+    assert create_response.status_code == 201
+    report_reference = create_response.json()["report_reference"]
+
+    detail_response = client.get(
+        f"/v1/internal/review/reports/{report_reference}",
+        headers={"X-Internal-Token": "dev-internal-review-token"},
+    )
+    assert detail_response.status_code == 200
+    labels = detail_response.json()["ai_labels"]
+    assert labels["model_version"] == "decision-rules-mvp-0.2"
+    assert labels["risk_score"] >= labels["severity_score"]
+    assert labels["confidence"] > 0
+    assert labels["review_priority"] in {"high", "critical"}
+    assert labels["recommended_action"] in {"human_review", "urgent_human_review"}
+    assert labels["public_guidance_allowed"] is False
+    assert "escalation_language" in labels["risk_factors"]
+
+
+def test_duplicate_report_signal_routes_repeat_submission_to_review() -> None:
+    duplicate_report_guard.reset()
+    try:
+        first_payload = _report_payload(f"dup-first-{uuid4()}")
+        second_payload = {
+            **first_payload,
+            "client_report_id": f"dup-second-{uuid4()}",
+        }
+
+        first_response = client.post("/v1/reports", json=first_payload)
+        assert first_response.status_code == 201
+        second_response = client.post("/v1/reports", json=second_payload)
+        assert second_response.status_code == 201
+
+        report_reference = second_response.json()["report_reference"]
+        detail_response = client.get(
+            f"/v1/internal/review/reports/{report_reference}",
+            headers={"X-Internal-Token": "dev-internal-review-token"},
+        )
+        assert detail_response.status_code == 200
+        assert detail_response.json()["status"] == "under_review"
+        labels = detail_response.json()["ai_labels"]
+        assert labels["duplicate_signal"] is True
+        assert labels["recommended_action"] == "review_duplicate_before_aggregation"
+        assert labels["public_guidance_allowed"] is False
+        assert "possible_duplicate_or_spam" in labels["risk_factors"]
+    finally:
+        duplicate_report_guard.reset()

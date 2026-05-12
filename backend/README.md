@@ -16,7 +16,7 @@ Implemented now:
 - County risk guidance.
 - App configuration.
 - Localized safety resources.
-- Deterministic MVP AI pipeline placeholder.
+- Decision intelligence service with deterministic MVP scoring, review routing, and risk labels.
 - In-memory repositories for local development.
 - PostgreSQL/PostGIS SQLAlchemy models.
 - Alembic migration for report and county risk tables.
@@ -25,6 +25,8 @@ Implemented now:
 - Request ID middleware and safe structured request logs with no report text.
 - Readiness checks for deployment health probes.
 - Public report payload-size and rate-limit controls.
+- Privacy-preserving duplicate report signals.
+- Standard API error envelope.
 - Production Dockerfile and backend deployment runbook.
 - Tests for the core API contracts.
 
@@ -149,7 +151,8 @@ GET  /v1/internal/review/reports/{report_reference}/events
 
 ## Architecture
 
-The iPhone app should remain a safe reporting client. It should not own peace intelligence or AI decisions.
+Citizen clients should remain safe reporting surfaces. They should not own peace intelligence
+or AI decisions.
 
 Backend responsibilities:
 
@@ -157,10 +160,55 @@ Backend responsibilities:
 - Validate and minimize data.
 - Encrypt sensitive report descriptions before storing them.
 - Run classification and escalation logic.
+- Derive decision-intelligence labels for partner review.
 - Add non-sensitive PII/safety flags for human reviewers.
 - Update aggregated county risk guidance.
 - Keep high-risk reports available for future human review.
-- Serve calm, public, non-sensitive guidance back to the iPhone app.
+- Serve calm, public, non-sensitive guidance back to citizen surfaces.
+
+## Report Sources
+
+Citizen reports may come from:
+
+- `ios_citizen_app`
+- `web_citizen_portal`
+
+Internal review and partner dashboard APIs stay separate from citizen APIs and require
+`X-Internal-Token`.
+
+## Error Shape
+
+All backend errors should use the same envelope:
+
+```json
+{
+  "error": {
+    "code": "validation_error",
+    "message": "field: explanation",
+    "retryable": false
+  }
+}
+```
+
+This keeps iPhone, web, and partner clients aligned on failure handling.
+
+## Decision Intelligence
+
+The current decision intelligence provider is deterministic and auditable. It is not yet a
+machine-learning or LLM model. It produces stable labels that a future AI provider should keep:
+
+- `severity_score`
+- `risk_score`
+- `confidence`
+- `risk_factors`
+- `recommended_action`
+- `review_priority`
+- `public_guidance_allowed`
+- `needs_human_review`
+- `model_version`
+
+Reports with active violence, high-risk language, PII hints, or duplicate/spam signals are routed
+to human review before aggregation or public guidance.
 
 ## Observability
 
@@ -185,9 +233,12 @@ other personally identifying values. Use `LOG_FORMAT=json` for hosted environmen
 - `MAX_REQUEST_BODY_BYTES` rejects oversized submissions before validation.
 - `REPORT_RATE_LIMIT_COUNT` and `REPORT_RATE_LIMIT_WINDOW_SECONDS` throttle bursts from the
   same network client.
+- `DUPLICATE_REPORT_WINDOW_SECONDS` marks repeated category/county/text patterns as possible
+  duplicate or spam signals using a hash fingerprint, not raw report text.
 - Rate limiting is in-memory and intended as a first MVP layer. For multi-instance production,
   move this counter to Redis so limits apply consistently across API replicas.
-- The limiter does not log or persist report text, phone numbers, exact location, or user identity.
+- The limiter and duplicate guard do not log or persist report text, phone numbers, exact location,
+  or user identity.
 
 ## Worker Mode
 
@@ -240,4 +291,4 @@ KE-047 Nairobi
 1. Add PostGIS county centroids or boundaries for spatial aggregation.
 2. Add role-scoped reviewer permissions beyond the default reviewer role.
 3. Move public rate limiting to Redis for multi-instance deployments.
-4. Add duplicate/spam controls for public report submission.
+4. Add reviewer feedback into county risk recalculation.

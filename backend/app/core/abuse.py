@@ -1,4 +1,6 @@
+import re
 from collections import defaultdict, deque
+from hashlib import sha256
 from threading import Lock
 from time import monotonic
 
@@ -29,3 +31,43 @@ class InMemoryRateLimiter:
 
 
 report_rate_limiter = InMemoryRateLimiter()
+
+
+class DuplicateReportGuard:
+    def __init__(self) -> None:
+        self._fingerprints: dict[str, float] = {}
+        self._lock = Lock()
+
+    def assess(
+        self,
+        category: str,
+        county: str | None,
+        description: str,
+        window_seconds: int,
+    ) -> tuple[bool, str]:
+        fingerprint = self._fingerprint(category, county, description)
+        now = monotonic()
+        with self._lock:
+            expired_before = now - window_seconds
+            expired = [
+                key for key, timestamp in self._fingerprints.items() if timestamp < expired_before
+            ]
+            for key in expired:
+                del self._fingerprints[key]
+
+            duplicate = fingerprint in self._fingerprints
+            self._fingerprints[fingerprint] = now
+            return duplicate, fingerprint
+
+    def reset(self) -> None:
+        with self._lock:
+            self._fingerprints.clear()
+
+    def _fingerprint(self, category: str, county: str | None, description: str) -> str:
+        normalized_text = re.sub(r"\s+", " ", description.strip().lower())
+        normalized_county = (county or "unknown").strip().lower()
+        payload = f"{category}|{normalized_county}|{normalized_text}"
+        return sha256(payload.encode("utf-8")).hexdigest()
+
+
+duplicate_report_guard = DuplicateReportGuard()

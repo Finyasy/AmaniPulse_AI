@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from app.domain.enums import IncidentCategory, LocationMode, ReportStatus, RiskLevel
 
@@ -28,6 +28,11 @@ class LocationPayload(BaseModel):
     latitude_rounded: float | None = Field(default=None, ge=-90, le=90)
     longitude_rounded: float | None = Field(default=None, ge=-180, le=180)
     precision_km: int | None = Field(default=None, ge=1, le=50)
+
+    @field_validator("country")
+    @classmethod
+    def uppercase_country(cls, value: str | None) -> str | None:
+        return value.upper() if value is not None else None
 
     @model_validator(mode="after")
     def validate_location_mode(self) -> "LocationPayload":
@@ -64,7 +69,7 @@ class ReportCreate(BaseModel):
     incident_time: datetime
     location: LocationPayload
     language: Literal["en", "sw"] = "en"
-    source: Literal["ios_citizen_app"] = "ios_citizen_app"
+    source: Literal["ios_citizen_app", "web_citizen_portal"] = "ios_citizen_app"
     app_version: str = Field(default="1.0.0", max_length=20)
     consents: ConsentPayload
 
@@ -104,7 +109,11 @@ class ReviewReportSummary(BaseModel):
     area_label: str | None
     language: str
     severity_score: int | None = None
+    risk_score: int | None = None
+    confidence: float | None = None
     urgency: str | None = None
+    review_priority: str | None = None
+    recommended_action: str | None = None
     needs_human_review: bool | None = None
 
 
@@ -191,3 +200,7 @@ class ErrorDetail(BaseModel):
     code: str
     message: str
     retryable: bool = False
+
+
+class ErrorResponse(BaseModel):
+    error: ErrorDetail
