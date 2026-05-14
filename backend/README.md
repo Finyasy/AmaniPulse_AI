@@ -16,11 +16,20 @@ Implemented now:
 - County risk guidance.
 - App configuration.
 - Localized safety resources.
-- Deterministic MVP AI pipeline placeholder.
+- Decision intelligence service with deterministic MVP scoring, review routing, and risk labels.
 - In-memory repositories for local development.
 - PostgreSQL/PostGIS SQLAlchemy models.
 - Alembic migration for report and county risk tables.
 - Baseline risk guidance seeded for all 47 Kenya counties.
+- Hashed internal review API keys with reviewer identity derived from the token.
+- Request ID middleware and safe structured request logs with no report text.
+- Readiness checks for deployment health probes.
+- Public report payload-size and rate-limit controls.
+- Privacy-preserving duplicate report signals.
+- Standard API error envelope.
+- Optional report `county_code` alignment with county risk lookups.
+- App config hides unconfigured support channels instead of returning placeholders.
+- Production Dockerfile and backend deployment runbook.
 - Tests for the core API contracts.
 
 Prepared for next:
@@ -102,10 +111,34 @@ uv run pytest
 uv run ruff check .
 ```
 
+Run Postgres-backed integration tests when Docker services are up:
+
+```bash
+RUN_POSTGRES_TESTS=1 STORAGE_BACKEND=postgres uv run pytest tests/integration
+```
+
+## Build Container
+
+From the repository root:
+
+```bash
+docker build -t amanipulse-backend ./backend
+docker run --rm -p 8000:8000 --env-file backend/.env amanipulse-backend
+```
+
+Run migrations once per release before routing traffic:
+
+```bash
+STORAGE_BACKEND=postgres uv run alembic upgrade head
+```
+
+See `docs/deployment.md` for the backend deployment runbook.
+
 ## API Endpoints
 
 ```text
 GET  /v1/health
+GET  /v1/ready
 GET  /v1/incident-taxonomy?language=en
 POST /v1/reports
 GET  /v1/reports/{report_reference}/status
@@ -120,7 +153,8 @@ GET  /v1/internal/review/reports/{report_reference}/events
 
 ## Architecture
 
-The iPhone app should remain a safe reporting client. It should not own peace intelligence or AI decisions.
+Citizen clients should remain safe reporting surfaces. They should not own peace intelligence
+or AI decisions.
 
 Backend responsibilities:
 
@@ -128,9 +162,102 @@ Backend responsibilities:
 - Validate and minimize data.
 - Encrypt sensitive report descriptions before storing them.
 - Run classification and escalation logic.
+- Derive decision-intelligence labels for partner review.
+- Add non-sensitive PII/safety flags for human reviewers.
 - Update aggregated county risk guidance.
 - Keep high-risk reports available for future human review.
-- Serve calm, public, non-sensitive guidance back to the iPhone app.
+- Serve calm, public, non-sensitive guidance back to citizen surfaces.
+
+## Report Sources
+
+Citizen reports may come from:
+
+- `ios_citizen_app`
+- `web_citizen_portal`
+
+Internal review and partner dashboard APIs stay separate from citizen APIs and require
+`X-Internal-Token`.
+
+## Location Contract
+
+Report locations support both human-readable county names and canonical Kenya county codes:
+
+```json
+{
+  "mode": "manual_area",
+  "country": "KE",
+  "county_code": "KE-047",
+  "county": "Nairobi",
+  "area_label": "Kasarani"
+}
+```
+
+`county_code` is optional for backward compatibility, but citizen clients should send it whenever
+available. Backend risk aggregation prefers `county_code` and falls back to county-name lookup.
+
+## Error Shape
+
+All backend errors should use the same envelope:
+
+```json
+{
+  "error": {
+    "code": "validation_error",
+    "message": "field: explanation",
+    "retryable": false
+  }
+}
+```
+
+This keeps iPhone, web, and partner clients aligned on failure handling.
+
+## Decision Intelligence
+
+The current decision intelligence provider is deterministic and auditable. It is not yet a
+machine-learning or LLM model. It produces stable labels that a future AI provider should keep:
+
+- `severity_score`
+- `risk_score`
+- `confidence`
+- `risk_factors`
+- `recommended_action`
+- `review_priority`
+- `public_guidance_allowed`
+- `needs_human_review`
+- `model_version`
+
+Reports with active violence, high-risk language, PII hints, or duplicate/spam signals are routed
+to human review before aggregation or public guidance.
+
+## Observability
+
+Every response includes a request ID header. Clients may send `X-Request-ID`; otherwise the
+API generates one. Request logs include only production-safe metadata:
+
+- request ID
+- HTTP method
+- path without query string
+- status code
+- duration
+- environment
+
+Logs must not include report bodies, descriptions, tokens, exact locations, phone numbers, or
+other personally identifying values. Use `LOG_FORMAT=json` for hosted environments and
+`LOG_LEVEL=INFO` unless debugging a temporary non-production issue.
+
+## Public Abuse Controls
+
+`POST /v1/reports` has MVP guardrails for safer public launch:
+
+- `MAX_REQUEST_BODY_BYTES` rejects oversized submissions before validation.
+- `REPORT_RATE_LIMIT_COUNT` and `REPORT_RATE_LIMIT_WINDOW_SECONDS` throttle bursts from the
+  same network client.
+- `DUPLICATE_REPORT_WINDOW_SECONDS` marks repeated category/county/text patterns as possible
+  duplicate or spam signals using a hash fingerprint, not raw report text.
+- Rate limiting is in-memory and intended as a first MVP layer. For multi-instance production,
+  move this counter to Redis so limits apply consistently across API replicas.
+- The limiter and duplicate guard do not log or persist report text, phone numbers, exact location,
+  or user identity.
 
 ## Worker Mode
 
@@ -145,6 +272,10 @@ Internal review endpoints require:
 ```text
 X-Internal-Token: <INTERNAL_API_TOKEN>
 ```
+
+In PostgreSQL mode, internal tokens are stored as SHA-256 hashes in the
+`internal_api_keys` table. The request body cannot choose the reviewer identity;
+review events use the reviewer attached to the authenticated key.
 
 Use them to inspect reports marked `under_review` and apply safe review decisions:
 
@@ -165,6 +296,9 @@ KE-042 Kisumu
 KE-047 Nairobi
 ```
 
+Use these same codes in report payloads, iPhone risk guidance, public web reporting, partner maps,
+and `/v1/risk/county/{county_code}` requests.
+
 ## Important Safety Notes
 
 - No user accounts are required.
@@ -177,7 +311,6 @@ KE-047 Nairobi
 ## Next Implementation Milestones
 
 1. Add PostGIS county centroids or boundaries for spatial aggregation.
-2. Add Postgres-backed integration tests behind an opt-in environment flag.
-3. Add stronger internal authentication for reviewers.
-4. Add PII detection/redaction hints for report descriptions.
-5. Add deployment config for Render, Fly, AWS, or another selected host.
+2. Add role-scoped reviewer permissions beyond the default reviewer role.
+3. Move public rate limiting to Redis for multi-instance deployments.
+4. Add reviewer feedback into county risk recalculation.

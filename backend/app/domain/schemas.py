@@ -1,7 +1,7 @@
 from datetime import UTC, datetime
 from typing import Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from app.domain.enums import IncidentCategory, LocationMode, ReportStatus, RiskLevel
 
@@ -23,11 +23,22 @@ class ConsentPayload(BaseModel):
 class LocationPayload(BaseModel):
     mode: LocationMode
     country: str | None = Field(default=None, min_length=2, max_length=2)
+    county_code: str | None = Field(default=None, pattern=r"^KE-\d{3}$")
     county: str | None = Field(default=None, max_length=80)
     area_label: str | None = Field(default=None, max_length=120)
     latitude_rounded: float | None = Field(default=None, ge=-90, le=90)
     longitude_rounded: float | None = Field(default=None, ge=-180, le=180)
     precision_km: int | None = Field(default=None, ge=1, le=50)
+
+    @field_validator("country", mode="before")
+    @classmethod
+    def uppercase_country(cls, value: object) -> object:
+        return value.upper() if isinstance(value, str) else value
+
+    @field_validator("county_code", mode="before")
+    @classmethod
+    def uppercase_county_code(cls, value: object) -> object:
+        return value.upper() if isinstance(value, str) else value
 
     @model_validator(mode="after")
     def validate_location_mode(self) -> "LocationPayload":
@@ -64,7 +75,7 @@ class ReportCreate(BaseModel):
     incident_time: datetime
     location: LocationPayload
     language: Literal["en", "sw"] = "en"
-    source: Literal["ios_citizen_app"] = "ios_citizen_app"
+    source: Literal["ios_citizen_app", "web_citizen_portal"] = "ios_citizen_app"
     app_version: str = Field(default="1.0.0", max_length=20)
     consents: ConsentPayload
 
@@ -100,11 +111,16 @@ class ReviewReportSummary(BaseModel):
     incident_time: datetime
     received_at: datetime
     updated_at: datetime
+    county_code: str | None
     county: str | None
     area_label: str | None
     language: str
     severity_score: int | None = None
+    risk_score: int | None = None
+    confidence: float | None = None
     urgency: str | None = None
+    review_priority: str | None = None
+    recommended_action: str | None = None
     needs_human_review: bool | None = None
 
 
@@ -119,7 +135,7 @@ class ReviewQueueResponse(BaseModel):
 
 class ReviewDecisionRequest(BaseModel):
     status: Literal["aggregated", "closed", "unable_to_process"]
-    reviewer_id: str = Field(..., min_length=2, max_length=80)
+    reviewer_id: str | None = Field(default=None, min_length=2, max_length=80)
     note: str = Field(..., min_length=3, max_length=500)
 
 
@@ -191,3 +207,7 @@ class ErrorDetail(BaseModel):
     code: str
     message: str
     retryable: bool = False
+
+
+class ErrorResponse(BaseModel):
+    error: ErrorDetail

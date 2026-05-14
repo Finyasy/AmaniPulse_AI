@@ -26,3 +26,9 @@ class ReportRecord:
         if self.location.mode == LocationMode.none:
             return None
         return self.location.county
+
+    @property
+    def county_code(self) -> str | None:
+        if self.location.mode == LocationMode.none:
+            return None
+        return self.location.county_code
