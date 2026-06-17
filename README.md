@@ -38,6 +38,7 @@ Responder dashboards, NGO triage consoles, SMS, USSD, WhatsApp, and predictive a
 - [Accessibility, Localization, and Low Bandwidth](docs/08-accessibility-localization-low-bandwidth.md)
 - [Testing and Quality](docs/09-testing-and-quality.md)
 - [Roadmap and Launch Plan](docs/10-roadmap-and-launch-plan.md)
+- [Andela x Open Accelerator Runbook](docs/11-andela-open-accelerator-runbook.md)
 
 ## Product Principles
 
