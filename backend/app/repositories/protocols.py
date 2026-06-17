@@ -50,5 +50,6 @@ class RiskStore(Protocol):
         self,
         county_name: str | None,
         severity_score: int,
+        county_code: str | None = None,
     ) -> CountyRiskResponse | None:
         pass

@@ -23,16 +23,22 @@ class ConsentPayload(BaseModel):
 class LocationPayload(BaseModel):
     mode: LocationMode
     country: str | None = Field(default=None, min_length=2, max_length=2)
+    county_code: str | None = Field(default=None, pattern=r"^KE-\d{3}$")
     county: str | None = Field(default=None, max_length=80)
     area_label: str | None = Field(default=None, max_length=120)
     latitude_rounded: float | None = Field(default=None, ge=-90, le=90)
     longitude_rounded: float | None = Field(default=None, ge=-180, le=180)
     precision_km: int | None = Field(default=None, ge=1, le=50)
 
-    @field_validator("country")
+    @field_validator("country", mode="before")
     @classmethod
-    def uppercase_country(cls, value: str | None) -> str | None:
-        return value.upper() if value is not None else None
+    def uppercase_country(cls, value: object) -> object:
+        return value.upper() if isinstance(value, str) else value
+
+    @field_validator("county_code", mode="before")
+    @classmethod
+    def uppercase_county_code(cls, value: object) -> object:
+        return value.upper() if isinstance(value, str) else value
 
     @model_validator(mode="after")
     def validate_location_mode(self) -> "LocationPayload":
@@ -105,6 +111,7 @@ class ReviewReportSummary(BaseModel):
     incident_time: datetime
     received_at: datetime
     updated_at: datetime
+    county_code: str | None
     county: str | None
     area_label: str | None
     language: str

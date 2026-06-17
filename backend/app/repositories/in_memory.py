@@ -109,12 +109,14 @@ class InMemoryRiskStore:
         self,
         county_name: str | None,
         severity_score: int,
+        county_code: str | None = None,
     ) -> CountyRiskResponse | None:
-        county_code = await self.county_code_for_name(county_name)
-        if county_code is None:
+        resolved_county_code = county_code or await self.county_code_for_name(county_name)
+        if resolved_county_code is None:
             return None
+        resolved_county_code = resolved_county_code.upper()
         with self._lock:
-            current = self._risk[county_code]
+            current = self._risk[resolved_county_code]
             score = min(100, current.score + max(1, severity_score // 10))
             level = RiskLevel.low
             if score >= 80:
@@ -135,7 +137,7 @@ class InMemoryRiskStore:
                     ),
                 }
             )
-            self._risk[county_code] = updated
+            self._risk[resolved_county_code] = updated
             return updated
 
 

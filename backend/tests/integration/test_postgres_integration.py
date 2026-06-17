@@ -47,7 +47,7 @@ def test_postgres_migrations_and_county_seed() -> None:
 
         await engine.dispose()
         assert county_count == 47
-        assert revision == "20260511_0005"
+        assert revision == "20260513_0006"
         assert row.county_name == "Nairobi"
         assert row.risk_level in {"low", "moderate", "high", "critical"}
         assert 0 <= row.score <= 100
@@ -74,6 +74,7 @@ def test_postgres_encryption_processing_and_review_audit() -> None:
                 location=LocationPayload(
                     mode=LocationMode.manual_area,
                     country="KE",
+                    county_code="KE-047",
                     county="Nairobi",
                     area_label="Kasarani",
                 ),
@@ -103,6 +104,7 @@ def test_postgres_encryption_processing_and_review_audit() -> None:
             retrieved = await report_store.get(created.report_reference)
             assert retrieved is not None
             assert retrieved.description == plaintext
+            assert retrieved.location.county_code == "KE-047"
 
             await ai_pipeline.process_report(
                 report_reference=created.report_reference,

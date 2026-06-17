@@ -32,6 +32,7 @@ class SqlReportStore:
             incident_time=record.incident_time,
             location_mode=record.location.mode.value,
             country=record.location.country,
+            county_code=record.location.county_code,
             county=record.location.county,
             area_label=record.location.area_label,
             latitude_rounded=record.location.latitude_rounded,
@@ -130,6 +131,7 @@ class SqlReportStore:
             location=LocationPayload(
                 mode=LocationMode(model.location_mode),
                 country=model.country,
+                county_code=model.county_code,
                 county=model.county,
                 area_label=model.area_label,
                 latitude_rounded=model.latitude_rounded,
@@ -174,16 +176,23 @@ class SqlRiskStore:
         )
         return model.county_code if model is not None else None
 
+    async def county_name_for_code(self, county_code: str | None) -> str | None:
+        if county_code is None:
+            return None
+        model = await self._session.get(CountyRiskModel, county_code.upper())
+        return model.county_name if model is not None else None
+
     async def bump_for_report(
         self,
         county_name: str | None,
         severity_score: int,
+        county_code: str | None = None,
     ) -> CountyRiskResponse | None:
-        county_code = await self.county_code_for_name(county_name)
-        if county_code is None:
+        resolved_county_code = county_code or await self.county_code_for_name(county_name)
+        if resolved_county_code is None:
             return None
 
-        model = await self._session.get(CountyRiskModel, county_code)
+        model = await self._session.get(CountyRiskModel, resolved_county_code.upper())
         if model is None:
             return None
 

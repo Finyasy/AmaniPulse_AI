@@ -17,7 +17,16 @@ struct AmaniPulseCitizenApp: App {
             draftStore = (try? EncryptedReportDraftStore.appSupportStore()) ?? InMemoryReportDraftStore()
         }
 
-        let environment = AppEnvironment.current()
+        let environment: AppEnvironment
+        #if DEBUG
+        environment = AppEnvironment.resolve(
+            environment: ProcessInfo.processInfo.environment,
+            bundleAPIProfile: "local",
+            bundleAPIBaseURL: "http://127.0.0.1:8000"
+        )
+        #else
+        environment = AppEnvironment.current()
+        #endif
         let forcedNetworkAvailable = ProcessInfo.processInfo.environment["AMANIPULSE_NETWORK_AVAILABLE"].map { $0 == "1" }
         let model: AppViewModel
 

@@ -28,6 +28,7 @@ class AiPipeline:
         await risk_store.bump_for_report(
             record.county,
             severity_score=int(labels["severity_score"]),
+            county_code=record.county_code,
         )
         return updated
 
